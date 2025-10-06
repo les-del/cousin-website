@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Player Test - COUSIN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background-color: #ffffff;
+      color: #000000;
+      font-size: 18px;
+      line-height: 100%;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .test-container {
+      padding: 2em;
+    }
+
+    .test-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 2em;
+    }
+
+    .test-button {
+      background: none;
+      border: 2px solid #000;
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      text-transform: uppercase;
+      padding: 1em 2em;
+      cursor: pointer;
+      margin-right: 1em;
+      margin-bottom: 1em;
+    }
+
+    .test-button:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    /* Lightbox */
+    .director-portfolio-lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 1000;
+      flex-direction: column;
+    }
+
+    .director-portfolio-lightbox[data-active="1"] {
+      display: flex;
+    }
+
+    .director-portfolio-lightbox-media {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 1em;
+    }
+
+    .director-portfolio-lightbox-media-video-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .director-portfolio-lightbox-media-video,
+    .video-hover-overlay-media-video {
+      max-width: 75vw;
+      max-height: calc(100vh - 2em);
+      width: 75vw;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      vertical-align: top;
+    }
+
+    .video-hover-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      display: none;
+      flex-direction: column;
+      z-index: 1500;
+      pointer-events: none;
+    }
+
+    .video-hover-overlay[data-active="1"] {
+      display: flex;
+    }
+
+    .video-hover-overlay-media {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 1em;
+    }
+
+    .video-hover-overlay-media-video-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .director-portfolio-lightbox-media-playbar {
+      width: 100%;
+      height: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      margin-top: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .director-portfolio-lightbox-media-playbar.show {
+      opacity: 1;
+    }
+
+    .director-portfolio-lightbox-media-playbar-meter {
+      width: 100%;
+      height: 100%;
+    }
+
+    .director-portfolio-lightbox-media-playbar-meter-progress {
+      width: 0%;
+      height: 100%;
+      background: #000;
+    }
+
+
+    .director-portfolio-lightbox-bottom {
+      position: absolute;
+      bottom: 1em;
+      left: 1em;
+      right: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .director-portfolio-lightbox-video-controls {
+      margin-top: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .director-portfolio-lightbox-video-controls.show {
+      opacity: 1;
+    }
+
+    .director-portfolio-lightbox-video-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+
+    .director-portfolio-lightbox-video-controls-right {
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      line-height: 100%;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .director-portfolio-lightbox-title {
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+    }
+
+    .director-portfolio-lightbox-back {
+      background: none;
+      border: none;
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .director-portfolio-lightbox-controls {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+
+    .director-portfolio-lightbox-controls-play,
+    .director-portfolio-lightbox-controls-pause {
+      cursor: pointer;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+      transition: opacity 0.2s ease;
+    }
+
+    .director-portfolio-lightbox-controls-play:hover,
+    .director-portfolio-lightbox-controls-pause:hover {
+      opacity: 0.5;
+    }
+
+    .director-portfolio-lightbox-controls-play[data-active="0"],
+    .director-portfolio-lightbox-controls-pause[data-active="0"] {
+      display: none;
+    }
+
+    .director-portfolio-lightbox-controls-play svg,
+    .director-portfolio-lightbox-controls-pause svg {
+      fill: #000;
+      stroke: #000;
+    }
+
+    .director-portfolio-lightbox-controls-time {
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      line-height: 100%;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    /* Video hover overlay - shows only video image */
+
+    /* Project items */
+    .project-item {
+      cursor: pointer;
+    }
+
+    .project-item:hover {
+      color: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <!-- Dummy Navigation - Only Directors expanded -->
+  <nav style="position: fixed; bottom: 1em; left: 1em; z-index: 3000; font-family: 'Space Mono', monospace; font-size: 18px; text-transform: uppercase;">
+    <ul style="list-style: none; margin: 0; padding: 0;">
+      <li style="margin-bottom: 0;">
+        <div style="color: #000000; cursor: pointer; margin-bottom: 0;">About</div>
+      </li>
+      <li style="margin-bottom: 0;">
+        <div style="color: #000000; cursor: pointer; margin-bottom: 0;">Directors</div>
+        <ul style="list-style: none; margin: 0; padding: 0; max-height: 800px; opacity: 1; margin-bottom: 1em;">
+          <li style="padding-left: 1em; margin-bottom: 0;">
+            <div style="color: #000000; cursor: pointer; margin-bottom: 0;">Ariel Martin</div>
+            <ul style="list-style: none; margin: 0; padding: 0; max-height: 800px; opacity: 1;">
+              <li class="project-item" style="padding-left: 2em; margin-bottom: 0; cursor: pointer; color: #000000;" data-video="Ariel_Martin/KIA_SNIPPET.mp4">Kia 'The Ute'</li>
+              <li class="project-item" style="padding-left: 2em; margin-bottom: 0; cursor: pointer; color: #000000;" data-video="Ariel_Martin/WAPOLICE-SNIPPET.mp4">WA Police 'Office'</li>
+              <li class="project-item" style="padding-left: 2em; margin-bottom: 0; cursor: pointer; color: #000000;" data-video="Ariel_Martin/VODA_SNIPPET.mp4">Vodafone 'Control Room'</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li style="margin-bottom: 0;">
+        <div style="color: #000000; cursor: pointer; margin-bottom: 0;">Contact</div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Image hover overlay - shows only image -->
+  <div class="video-hover-overlay" data-active="0">
+    <div class="video-hover-overlay-media">
+      <div class="video-hover-overlay-media-video-container">
+        <img class="video-hover-overlay-media-video" src="" alt="">
+      </div>
+    </div>
+  </div>
+
+  <div class="director-portfolio-lightbox" data-active="0">
+    <div class="director-portfolio-lightbox-media">
+      <div class="director-portfolio-lightbox-media-video-container">
+        <video playsinline class="director-portfolio-lightbox-media-video" onclick="toggleVideo();" poster="Ariel_Martin/Kia_optimized.png">
+          <source src="Ariel_Martin/KIA_SNIPPET.mp4" type="video/mp4">
+        </video>
+        <div class="director-portfolio-lightbox-media-playbar" onmousedown="setProgress(event);" ontouchstart="setProgress(event);">
+          <div class="director-portfolio-lightbox-media-playbar-meter">
+            <div class="director-portfolio-lightbox-media-playbar-meter-progress"></div>
+          </div>
+        </div>
+        <div class="director-portfolio-lightbox-video-controls">
+          <div class="director-portfolio-lightbox-video-controls-left">
+            <div class="director-portfolio-lightbox-controls-play" data-active="1" onclick="playVideo();">
+              <svg width="18" height="18" viewBox="0 0 18 18"><path d="M15.75 9L2.25 15.75L2.25 2.25L15.75 9Z"/></svg>
+            </div>
+            <div class="director-portfolio-lightbox-controls-pause" data-active="0" onclick="pauseVideo();">
+              <svg width="18" height="18" viewBox="0 0 18 18"><rect x="3" y="3" width="4.5" height="12" fill="currentColor"/><rect x="10.5" y="3" width="4.5" height="12" fill="currentColor"/></svg>
+            </div>
+            <div class="director-portfolio-lightbox-controls-time">
+              <span class="director-portfolio-lightbox-controls-time-current">00:00</span> – <span class="director-portfolio-lightbox-controls-time-total">00:00</span>
+            </div>
+          </div>
+          <div class="director-portfolio-lightbox-video-controls-right" onclick="toggleFullscreen();">
+            FULL SCREEN
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize video when page loads
+    window.addEventListener('load', function() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      video.load();
+      video.play();
+      updateTimeDisplay();
+      
+      // Add event listeners for video state changes
+      video.addEventListener('play', updateButtonStates);
+      video.addEventListener('pause', updateButtonStates);
+      video.addEventListener('ended', updateButtonStates);
+    });
+
+    function closeLightbox() {
+      const lightbox = document.querySelector('.director-portfolio-lightbox');
+      const video = lightbox.querySelector('.director-portfolio-lightbox-media-video');
+      
+      video.pause();
+      video.currentTime = 0;
+    }
+
+    function toggleVideo() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      if (video.paused) {
+        playVideo();
+      } else {
+        pauseVideo();
+      }
+    }
+
+    function playVideo() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+      const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+      
+      video.play();
+      playBtn.setAttribute('data-active', '0');
+      pauseBtn.setAttribute('data-active', '1');
+    }
+
+    function pauseVideo() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+      const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+      
+      video.pause();
+      playBtn.setAttribute('data-active', '1');
+      pauseBtn.setAttribute('data-active', '0');
+    }
+
+    // Update button states when video state changes
+    function updateButtonStates() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+      const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+      
+      if (video.paused) {
+        playBtn.setAttribute('data-active', '1');
+        pauseBtn.setAttribute('data-active', '0');
+      } else {
+        playBtn.setAttribute('data-active', '0');
+        pauseBtn.setAttribute('data-active', '1');
+      }
+    }
+
+    function setProgress(event) {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const width = rect.width;
+      const percentage = clickX / width;
+      
+      video.currentTime = percentage * video.duration;
+    }
+
+    function updateTimeDisplay() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      const currentTimeEl = document.querySelector('.director-portfolio-lightbox-controls-time-current');
+      const totalTimeEl = document.querySelector('.director-portfolio-lightbox-controls-time-total');
+      const progressBar = document.querySelector('.director-portfolio-lightbox-media-playbar-meter-progress');
+      
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+      
+      if (video.duration) {
+        totalTimeEl.textContent = formatTime(video.duration);
+      }
+      
+      video.addEventListener('timeupdate', function() {
+        currentTimeEl.textContent = formatTime(video.currentTime);
+        if (video.duration) {
+          const percentage = (video.currentTime / video.duration) * 100;
+          progressBar.style.width = percentage + '%';
+        }
+      });
+    }
+
+    // Close lightbox with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
+    // Image hover overlay functions
+    function showVideoHoverOverlay(videoSrc) {
+      const overlay = document.querySelector('.video-hover-overlay');
+      const img = overlay.querySelector('.video-hover-overlay-media-video');
+      
+      // Pause the main video player if it's playing and store its state
+      const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
+      if (mainPlayer && !mainPlayer.paused) {
+        mainPlayer.pause();
+        mainPlayer.setAttribute('data-was-playing', 'true');
+        console.log('Main video player paused');
+      } else {
+        mainPlayer.setAttribute('data-was-playing', 'false');
+      }
+      
+      // Hide controls and UI when entering hover mode
+      const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+      const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+      if (playbar) playbar.classList.remove('show');
+      if (controls) controls.classList.remove('show');
+      
+      // Convert video path to image path
+      let imageSrc;
+      if (videoSrc.includes('KIA_SNIPPET.mp4')) {
+        imageSrc = 'Ariel_Martin/Kia_optimized.png';
+      } else if (videoSrc.includes('WAPOLICE-SNIPPET.mp4')) {
+        imageSrc = 'Ariel_Martin/WA_police_optimized.png';
+      } else if (videoSrc.includes('VODA_SNIPPET.mp4')) {
+        imageSrc = 'Ariel_Martin/Vodafone_optimized.png';
+      }
+      
+      img.src = imageSrc;
+      overlay.setAttribute('data-active', '1');
+      console.log('Hover overlay shown for:', imageSrc);
+    }
+
+    function hideVideoHoverOverlay() {
+      const overlay = document.querySelector('.video-hover-overlay');
+      const img = overlay.querySelector('.video-hover-overlay-media-video');
+      const player = document.querySelector('.director-portfolio-lightbox');
+      const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
+      
+      img.src = '';
+      overlay.setAttribute('data-active', '0');
+      
+      // If video player is active, restore the controls and resume if it was playing
+      if (player.getAttribute('data-active') === '1') {
+        const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+        const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+        if (playbar) playbar.classList.add('show');
+        if (controls) controls.classList.add('show');
+        
+        // Resume video if it was playing before hover
+        if (mainPlayer.getAttribute('data-was-playing') === 'true') {
+          mainPlayer.play();
+          console.log('Main video player resumed');
+        }
+      }
+    }
+
+    // Add hover events to project items
+    document.addEventListener('DOMContentLoaded', function() {
+      const projectItems = document.querySelectorAll('.project-item');
+      
+      projectItems.forEach(function(item) {
+        item.addEventListener('mouseenter', function(e) {
+          e.stopPropagation();
+          
+          const player = document.querySelector('.director-portfolio-lightbox');
+          const videoSrc = item.getAttribute('data-video');
+          console.log('Mouse enter on:', item.textContent, 'Video:', videoSrc);
+          
+          if (videoSrc) {
+            if (player.getAttribute('data-active') === '1') {
+              // Video player is open - show temporary hover overlay
+              showVideoHoverOverlay(videoSrc);
+            } else {
+              // Video player is closed - show normal hover overlay
+              showVideoHoverOverlay(videoSrc);
+            }
+          }
+        });
+        
+        item.addEventListener('mouseleave', function(e) {
+          e.stopPropagation();
+          
+          const player = document.querySelector('.director-portfolio-lightbox');
+          if (player.getAttribute('data-active') === '1') {
+            // Video player is open - hide hover overlay to return to video
+            hideVideoHoverOverlay();
+          } else {
+            // Video player is closed - hide hover overlay normally
+            hideVideoHoverOverlay();
+          }
+        });
+        
+        item.addEventListener('click', function(e) {
+          e.stopPropagation();
+          
+          // Hide hover overlay first
+          hideVideoHoverOverlay();
+          
+          const videoSrc = item.getAttribute('data-video');
+          if (videoSrc) {
+            const player = document.querySelector('.director-portfolio-lightbox');
+            const videoSource = player.querySelector('.director-portfolio-lightbox-media-video source');
+            const videoElement = player.querySelector('.director-portfolio-lightbox-media-video');
+            
+            videoSource.src = videoSrc;
+            
+            // Set poster image based on video
+            if (videoSrc.includes('KIA_SNIPPET.mp4')) {
+              videoElement.poster = 'Ariel_Martin/Kia_optimized.png';
+            } else if (videoSrc.includes('WAPOLICE-SNIPPET.mp4')) {
+              videoElement.poster = 'Ariel_Martin/WA_police_optimized.png';
+            } else if (videoSrc.includes('VODA_SNIPPET.mp4')) {
+              videoElement.poster = 'Ariel_Martin/Vodafone_optimized.png';
+            }
+            
+            videoElement.load();
+            
+            // Reset video to beginning
+            videoElement.currentTime = 0;
+            
+            // Show the video player
+            player.setAttribute('data-active', '1');
+            
+            // Pause video initially (no autoplay)
+            videoElement.pause();
+            updateTimeDisplay();
+            
+            // Reset progress bar
+            const progressBar = document.querySelector('.director-portfolio-lightbox-media-playbar-meter-progress');
+            if (progressBar) {
+              progressBar.style.width = '0%';
+            }
+            
+            // Show controls after a short delay
+            setTimeout(() => {
+              const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+              const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+              playbar.classList.add('show');
+              controls.classList.add('show');
+            }, 500);
+            
+            // Update button states - show play button since video doesn't autoplay
+            const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+            const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+            playBtn.setAttribute('data-active', '1');
+            pauseBtn.setAttribute('data-active', '0');
+          }
+        });
+      });
+    });
+
+    function toggleFullscreen() {
+      const video = document.querySelector('.director-portfolio-lightbox-media-video');
+      if (!document.fullscreenElement) {
+        video.requestFullscreen().catch(err => {
+          console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+  </script>
+</body>
+</html>

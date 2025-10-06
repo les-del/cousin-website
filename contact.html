@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COUSIN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="Ariel_Martin/Ariel.png" alt="ARIEL" class="logo-image" id="ariel-logo">
+    </div>
+    
+    <div class="text-block">
+      <p id="director-name">DIRECTOR NAME</p>
+      <p><br></p>
+      <div id="projects-container">
+        <!-- Projects will be loaded here from CSV -->
+      </div>
+      <p><br></p>
+      <p>BACK</p>
+    </div>
+    
+    <!-- Hover image overlay -->
+    <div id="hover-image" class="hover-image">
+      <img id="hover-img" src="" alt="">
+    </div>
+    
+    <!-- Video modal -->
+    <div id="video-modal" class="video-modal">
+      <div class="video-modal-content">
+        <video id="modal-video" autoplay>
+          <source src="" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        
+        <!-- Back button -->
+        <div class="back-button" id="back-button">BACK</div>
+        
+        <!-- Play/Pause text -->
+        <div class="play-pause-text" id="play-pause-text">PAUSE</div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    // Load CSV and generate projects
+    Papa.parse('ArielMartin.csv', {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const container = document.getElementById('projects-container');
+        const hoverImage = document.getElementById('hover-image');
+        const hoverImg = document.getElementById('hover-img');
+        const directorName = document.getElementById('director-name');
+        
+        // Filter out empty rows and store globally
+        window.validData = results.data.filter(item => item.Client && item.Title);
+        
+        // Set director name from first valid row
+        if (window.validData.length > 0 && window.validData[0].Director) {
+          directorName.textContent = window.validData[0].Director.toUpperCase();
+        }
+        
+        window.validData.forEach(function(row, index) {
+          if (row.Client && row.Title) {
+            const projectElement = document.createElement('p');
+            projectElement.textContent = `${row.Client.toUpperCase()} '${row.Title.toUpperCase()}'`;
+            projectElement.className = 'project-item';
+            projectElement.dataset.thumbnail = row.Thumbnail;
+            projectElement.dataset.video = row.Video;
+            projectElement.dataset.index = index;
+            
+            // Add hover events
+            projectElement.addEventListener('mouseenter', function() {
+              hoverImg.src = row.Thumbnail;
+              hoverImage.style.display = 'flex';
+              // Hide Ariel logo on hover
+              const arielLogo = document.getElementById('ariel-logo');
+              arielLogo.style.display = 'none';
+            });
+            
+            projectElement.addEventListener('mouseleave', function() {
+              hoverImage.style.display = 'none';
+              // Show Ariel logo when not hovering
+              const arielLogo = document.getElementById('ariel-logo');
+              arielLogo.style.display = 'block';
+            });
+            
+            // Add click event for video modal
+            projectElement.addEventListener('click', function() {
+              const modal = document.getElementById('video-modal');
+              const video = document.getElementById('modal-video');
+              modal.style.display = 'flex';
+              
+              // Set video source
+              video.src = row.Video;
+              video.load();
+              
+              video.addEventListener('loadeddata', function() {
+                // Connect play/pause text to video
+                const playPauseText = document.getElementById('play-pause-text');
+                const modal = document.getElementById('video-modal');
+                
+                // Set initial play/pause text based on video state
+                if (video.paused) {
+                  playPauseText.textContent = 'PLAY';
+                } else {
+                  playPauseText.textContent = 'PAUSE';
+                }
+                
+                // Update text when video state changes
+                video.addEventListener('play', function() {
+                  playPauseText.textContent = 'PAUSE';
+                });
+                
+                video.addEventListener('pause', function() {
+                  playPauseText.textContent = 'PLAY';
+                });
+                
+                // Click on play/pause text to toggle
+                playPauseText.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  if (video.paused) {
+                    video.play().then(() => {
+                      playPauseText.textContent = 'PAUSE';
+                    }).catch(err => {
+                      console.error('Error playing video:', err);
+                    });
+                  } else {
+                    video.pause();
+                    playPauseText.textContent = 'PLAY';
+                  }
+                });
+                
+                // Back button functionality
+                const backButton = document.getElementById('back-button');
+                backButton.addEventListener('click', function() {
+                  modal.style.display = 'none';
+                  video.pause();
+                  video.currentTime = 0;
+                });
+              });
+            });
+            
+            container.appendChild(projectElement);
+          }
+        });
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      const modal = document.getElementById('video-modal');
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+        const video = document.getElementById('modal-video');
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+    
+  </script>
+</body>
+</html>
