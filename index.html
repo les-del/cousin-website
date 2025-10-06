@@ -430,6 +430,42 @@
       }
     }
 
+    /* Contact image overlay */
+    .contact-image-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .contact-image-overlay.show {
+      display: flex;
+    }
+
+    .contact-image-overlay img {
+      max-width: 200px;
+      max-height: 200px;
+      width: auto;
+      height: auto;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Mobile responsive contact image */
+    @media (max-width: 768px) {
+      .contact-image-overlay img {
+        max-width: 150px;
+        max-height: 150px;
+      }
+    }
+
     /* Prevent dragging for all images and videos */
     img, video {
       -webkit-user-select: none;
@@ -498,6 +534,11 @@
     <span id="toggle-text">Single Director</span>
   </div>
 
+  <!-- Contact image overlay -->
+  <div class="contact-image-overlay" id="contact-image-overlay">
+    <img src="hi.png" alt="Hi">
+  </div>
+
   <!-- Image hover overlay - shows only image -->
   <div class="video-hover-overlay" data-active="0">
     <div class="video-hover-overlay-media">
@@ -546,12 +587,16 @@
       const contactContent = document.getElementById('contact-content');
       const arielContent = document.getElementById('ariel-projects');
       const maxContent = document.getElementById('max-projects');
+      const contactImageOverlay = document.getElementById('contact-image-overlay');
       
       // Close other main sections AND their sub-sections
       directorsContent.classList.remove('open');
       contactContent.classList.remove('open');
       arielContent.classList.remove('open'); // Also close Ariel Martin
       maxContent.classList.remove('open'); // Also close Max Chan
+      
+      // Hide contact image when opening other sections
+      contactImageOverlay.classList.remove('show');
       
       // Toggle current section
       content.classList.toggle('open');
@@ -594,10 +639,14 @@
       const contactContent = document.getElementById('contact-content');
       const arielContent = document.getElementById('ariel-projects');
       const maxContent = document.getElementById('max-projects');
+      const contactImageOverlay = document.getElementById('contact-image-overlay');
       
       // Close other main sections
       aboutContent.classList.remove('open');
       contactContent.classList.remove('open');
+      
+      // Hide contact image when opening other sections
+      contactImageOverlay.classList.remove('show');
       
       // Toggle current section
       content.classList.toggle('open');
@@ -658,6 +707,7 @@
       const aboutContent = document.getElementById('about-content');
       const directorsContent = document.getElementById('directors-content');
       const arielContent = document.getElementById('ariel-projects');
+      const contactImageOverlay = document.getElementById('contact-image-overlay');
       
       // Close other main sections AND their sub-sections
       aboutContent.classList.remove('open');
@@ -666,6 +716,13 @@
       
       // Toggle current section
       content.classList.toggle('open');
+      
+      // Show/hide contact image based on contact section state
+      if (content.classList.contains('open')) {
+        contactImageOverlay.classList.add('show');
+      } else {
+        contactImageOverlay.classList.remove('show');
+      }
       
       // Always reset everything when clicking About/Contact/Directors
       closeVideoAndReset();
