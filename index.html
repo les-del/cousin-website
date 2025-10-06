@@ -675,8 +675,11 @@
       const content = document.getElementById('ariel-projects');
       const maxContent = document.getElementById('max-projects');
       
-      // Close Max Chan if it's open
-      maxContent.classList.remove('open');
+      // Close Max Chan if it's open and reset any playing video
+      if (maxContent.classList.contains('open')) {
+        maxContent.classList.remove('open');
+        closeVideoAndReset(); // Close any video that might be playing
+      }
       
       // Toggle current section
       content.classList.toggle('open');
@@ -700,8 +703,11 @@
       const content = document.getElementById('max-projects');
       const arielContent = document.getElementById('ariel-projects');
       
-      // Close Ariel Martin if it's open
-      arielContent.classList.remove('open');
+      // Close Ariel Martin if it's open and reset any playing video
+      if (arielContent.classList.contains('open')) {
+        arielContent.classList.remove('open');
+        closeVideoAndReset(); // Close any video that might be playing
+      }
       
       // Toggle current section
       content.classList.toggle('open');
