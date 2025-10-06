@@ -609,9 +609,13 @@
     function updateLogo() {
       const logo = document.querySelector('.logo');
       const arielContent = document.getElementById('ariel-projects');
+      const contactContent = document.getElementById('contact-content');
       const isMobile = window.innerWidth <= 768;
       
-      if (arielContent.classList.contains('open')) {
+      if (contactContent.classList.contains('open')) {
+        // Hide Cousin logo when contact section is open (hi.png is showing)
+        logo.classList.add('hidden');
+      } else if (arielContent.classList.contains('open')) {
         // Only show Ariel PNG when Ariel Martin section is specifically open
         logo.src = 'Ariel_Martin/Ariel.png';
         logo.classList.remove('hidden');
@@ -723,6 +727,9 @@
       } else {
         contactImageOverlay.classList.remove('show');
       }
+      
+      // Update logo visibility (hide Cousin when contact is open)
+      updateLogo();
       
       // Always reset everything when clicking About/Contact/Directors
       closeVideoAndReset();
