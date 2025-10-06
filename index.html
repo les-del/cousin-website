@@ -604,6 +604,9 @@
       
       // Always reset everything when clicking About/Contact/Directors
       closeVideoAndReset();
+      
+      // Update logo AFTER everything else is done to prevent glitches
+      setTimeout(updateLogo, 10);
     });
 
     // Global logo management function
@@ -635,7 +638,6 @@
     function closeVideoAndReset() {
       closeVideoPlayer();
       hideVideoHoverOverlay();
-      updateLogo(); // Reset logo to Cousin
     }
 
     document.getElementById('directors-toggle').addEventListener('click', function(e) {
@@ -664,6 +666,9 @@
       
       // Always reset everything when clicking About/Contact/Directors
       closeVideoAndReset();
+      
+      // Update logo AFTER everything else is done to prevent glitches
+      setTimeout(updateLogo, 10);
     });
 
     document.getElementById('ariel-toggle').addEventListener('click', function(e) {
@@ -729,11 +734,11 @@
         contactImageOverlay.classList.remove('show');
       }
       
-      // Update logo visibility (hide Cousin when contact is open)
-      updateLogo();
-      
       // Always reset everything when clicking About/Contact/Directors
       closeVideoAndReset();
+      
+      // Update logo visibility AFTER everything else is done to prevent glitches
+      setTimeout(updateLogo, 10);
     });
 
     // Load CSV data and create project elements
