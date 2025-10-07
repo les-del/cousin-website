@@ -959,18 +959,12 @@
           bioOverlay.classList.remove('show');
         });
         
-        // Add click event for Bio - toggle bio text overlay
+        // Add click event for Bio - show bio text overlay (stays up like videos)
         bioElement.addEventListener('click', function(e) {
           e.stopPropagation();
           
           const bioOverlay = document.getElementById('bio-text-overlay');
-          const isCurrentlyShown = bioOverlay.classList.contains('show');
-          
-          if (isCurrentlyShown) {
-            bioOverlay.classList.remove('show');
-          } else {
-            bioOverlay.classList.add('show');
-          }
+          bioOverlay.classList.add('show');
         });
         
         container.appendChild(bioElement);
