@@ -172,6 +172,17 @@
       transition-delay: 0s;
     }
 
+    /* Contact links styling */
+    .nav-sublist li a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-sublist li a:hover {
+      color: rgba(0, 0, 0, 0.5);
+    }
+
     /* Project items */
     .project-item {
       cursor: pointer;
@@ -553,10 +564,9 @@
       <li class="nav-item">
         <div id="contact-toggle" class="nav-toggle">Contact</div>
         <ul id="contact-content" class="nav-sublist">
-          <li>hello@cousin.com.au</li>
-          <li>+61 2 1234 5678</li>
-          <li>Sydney, Australia</li>
-          <li>Follow us on Instagram</li>
+          <li><a href="mailto:nick@cousin.site">nick@cousin.site</a></li>
+          <li><a href="tel:+61415064495">+61 415 064 495</a></li>
+          <li><a href="https://instagram.com/cousin.site" target="_blank">Instagram</a></li>
         </ul>
       </li>
     </ul>
