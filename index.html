@@ -111,13 +111,18 @@
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height 0.1s ease, opacity 0.1s ease, margin-bottom 0.1s ease;
+      transform: translateY(-10px);
+      transition: max-height 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                  opacity 0.3s ease-out, 
+                  margin-bottom 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                  transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .nav-sublist.open {
       max-height: 800px;
       opacity: 1;
       margin-bottom: 0;
+      transform: translateY(0);
     }
 
     /* Add spacing only to Directors sublist */
@@ -133,10 +138,38 @@
     .nav-sublist li {
       padding-left: 1em;
       margin-bottom: 0;
+      opacity: 0;
+      transform: translateY(-5px);
+      transition: opacity 0.2s ease-out 0.1s, transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.1s;
+    }
+
+    .nav-sublist.open li {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .nav-sublist .nav-sublist li {
       padding-left: 2em;
+      transition-delay: 0.2s;
+    }
+
+    .nav-sublist .nav-sublist li:nth-child(2) {
+      transition-delay: 0.25s;
+    }
+
+    .nav-sublist .nav-sublist li:nth-child(3) {
+      transition-delay: 0.3s;
+    }
+
+    .nav-sublist .nav-sublist li:nth-child(4) {
+      transition-delay: 0.35s;
+    }
+
+    /* Reset list items when closing */
+    .nav-sublist:not(.open) li {
+      opacity: 0;
+      transform: translateY(-5px);
+      transition-delay: 0s;
     }
 
     /* Project items */
