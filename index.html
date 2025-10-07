@@ -729,6 +729,11 @@
     function closeVideoAndReset() {
       closeVideoPlayer();
       hideVideoHoverOverlay();
+      // Also hide bio text overlay
+      const bioOverlay = document.getElementById('bio-text-overlay');
+      if (bioOverlay) {
+        bioOverlay.classList.remove('show');
+      }
     }
 
     document.getElementById('directors-toggle').addEventListener('click', function(e) {
@@ -954,10 +959,18 @@
           bioOverlay.classList.remove('show');
         });
         
-        // Add click event for Bio (does nothing, just prevents default)
+        // Add click event for Bio - toggle bio text overlay
         bioElement.addEventListener('click', function(e) {
           e.stopPropagation();
-          // Bio is hover-only, no click action needed
+          
+          const bioOverlay = document.getElementById('bio-text-overlay');
+          const isCurrentlyShown = bioOverlay.classList.contains('show');
+          
+          if (isCurrentlyShown) {
+            bioOverlay.classList.remove('show');
+          } else {
+            bioOverlay.classList.add('show');
+          }
         });
         
         container.appendChild(bioElement);
