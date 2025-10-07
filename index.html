@@ -511,6 +511,49 @@
       }
     }
 
+    /* Bio text overlay */
+    .bio-text-overlay {
+      position: fixed;
+      top: 1em;
+      left: 1em;
+      width: 25%;
+      background: transparent;
+      display: none;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .bio-text-overlay.show {
+      display: block;
+    }
+
+    .bio-text-overlay p {
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      line-height: 120%;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: none;
+      margin: 0;
+      padding: 0;
+      opacity: 1;
+      transition: none;
+    }
+
+    /* Mobile responsive bio text */
+    @media (max-width: 768px) {
+      .bio-text-overlay {
+        width: 80%;
+        top: 1em;
+        left: 1em;
+      }
+      
+      .bio-text-overlay p {
+        font-size: 16px;
+      }
+    }
+
     /* Prevent dragging for all images and videos */
     img, video {
       -webkit-user-select: none;
@@ -581,6 +624,11 @@
   <!-- Contact image overlay -->
   <div class="contact-image-overlay" id="contact-image-overlay">
     <img src="hi.png" alt="Hi">
+  </div>
+
+  <!-- Bio text overlay -->
+  <div class="bio-text-overlay" id="bio-text-overlay">
+    <p>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Maecenas faucibus mollis interdum. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
   </div>
 
   <!-- Image hover overlay - shows only image -->
@@ -879,6 +927,40 @@
           
           container.appendChild(projectElement);
         });
+
+        // Add Bio item at the end
+        const bioElement = document.createElement('li');
+        bioElement.className = 'project-item bio-item';
+        bioElement.textContent = 'Bio';
+        bioElement.dataset.bio = 'true';
+        
+        // Add hover events for Bio
+        bioElement.addEventListener('mouseenter', function(e) {
+          e.stopPropagation();
+          
+          // Check if hover effects are enabled
+          if (!hoverEffectsEnabled) {
+            return;
+          }
+          
+          const bioOverlay = document.getElementById('bio-text-overlay');
+          bioOverlay.classList.add('show');
+        });
+
+        bioElement.addEventListener('mouseleave', function(e) {
+          e.stopPropagation();
+          
+          const bioOverlay = document.getElementById('bio-text-overlay');
+          bioOverlay.classList.remove('show');
+        });
+        
+        // Add click event for Bio (does nothing, just prevents default)
+        bioElement.addEventListener('click', function(e) {
+          e.stopPropagation();
+          // Bio is hover-only, no click action needed
+        });
+        
+        container.appendChild(bioElement);
       }
     });
 
