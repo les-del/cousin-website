@@ -742,6 +742,29 @@
       }
     });
 
+    // Add hover effects for Ariel toggle
+    document.getElementById('ariel-toggle').addEventListener('mouseenter', function(e) {
+      const logo = document.querySelector('.logo');
+      const isMobile = window.innerWidth <= 768;
+      
+      // Only show Ariel logo on hover if directors section is open but ariel projects is not open
+      const directorsContent = document.getElementById('directors-content');
+      const arielContent = document.getElementById('ariel-projects');
+      
+      if (directorsContent.classList.contains('open') && !arielContent.classList.contains('open')) {
+        logo.src = 'Ariel_Martin/Ariel.png';
+        logo.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('ariel-toggle').addEventListener('mouseleave', function(e) {
+      // Only reset logo if ariel projects section is not open
+      const arielContent = document.getElementById('ariel-projects');
+      if (!arielContent.classList.contains('open')) {
+        updateLogo();
+      }
+    });
+
     document.getElementById('max-toggle').addEventListener('click', function(e) {
       const content = document.getElementById('max-projects');
       const arielContent = document.getElementById('ariel-projects');
