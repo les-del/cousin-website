@@ -729,10 +729,11 @@
     function closeVideoAndReset() {
       closeVideoPlayer();
       hideVideoHoverOverlay();
-      // Also hide bio text overlay
+      // Also hide bio text overlay and reset permanently open state
       const bioOverlay = document.getElementById('bio-text-overlay');
       if (bioOverlay) {
         bioOverlay.classList.remove('show');
+        bioOverlay.removeAttribute('data-permanently-open');
       }
     }
 
@@ -948,6 +949,20 @@
             return;
           }
           
+          // Hide the entire video player when entering bio hover mode
+          const player = document.querySelector('.director-portfolio-lightbox');
+          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
+          if (mainPlayer && !mainPlayer.paused) {
+            mainPlayer.pause();
+            mainPlayer.setAttribute('data-was-playing', 'true');
+            console.log('Main video player paused for bio hover');
+          } else {
+            mainPlayer.setAttribute('data-was-playing', 'false');
+          }
+          
+          // Hide the entire video player overlay
+          player.setAttribute('data-active', '0');
+          
           const bioOverlay = document.getElementById('bio-text-overlay');
           bioOverlay.classList.add('show');
         });
@@ -956,15 +971,61 @@
           e.stopPropagation();
           
           const bioOverlay = document.getElementById('bio-text-overlay');
-          bioOverlay.classList.remove('show');
+          
+          // Only hide bio text if it's not permanently open
+          if (bioOverlay.getAttribute('data-permanently-open') !== 'true') {
+            bioOverlay.classList.remove('show');
+          }
+          
+          // Only restore video player if it was playing before bio hover
+          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
+          if (mainPlayer.getAttribute('data-was-playing') === 'true') {
+            const player = document.querySelector('.director-portfolio-lightbox');
+            
+            // Show the video player again
+            player.setAttribute('data-active', '1');
+            
+            // Show controls
+            const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+            const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+            if (playbar) playbar.classList.add('show');
+            if (controls) controls.classList.add('show');
+            
+            // Resume video
+            mainPlayer.play();
+            console.log('Main video player restored and resumed after bio hover');
+          }
         });
         
-        // Add click event for Bio - show bio text overlay (stays up like videos)
+        // Add click event for Bio - open bio text permanently (like videos)
         bioElement.addEventListener('click', function(e) {
           e.stopPropagation();
           
           const bioOverlay = document.getElementById('bio-text-overlay');
+          
+          // Open bio text permanently (like opening a video)
           bioOverlay.classList.add('show');
+          
+          // Mark bio as permanently open
+          bioOverlay.setAttribute('data-permanently-open', 'true');
+          
+          // If there was a video playing before, restore it
+          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
+          if (mainPlayer.getAttribute('data-was-playing') === 'true') {
+            const player = document.querySelector('.director-portfolio-lightbox');
+            
+            // Show the video player again
+            player.setAttribute('data-active', '1');
+            
+            // Show controls
+            const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+            const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+            if (playbar) playbar.classList.add('show');
+            if (controls) controls.classList.add('show');
+            
+            // Resume video
+            mainPlayer.play();
+          }
         });
         
         container.appendChild(bioElement);
