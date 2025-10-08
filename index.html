@@ -33,6 +33,20 @@
       font-weight: 400;
       letter-spacing: -0.02em;
       text-transform: uppercase;
+      /* UNIVERSAL 1EM MARGIN - NEVER TO BE VIOLATED */
+      margin: 0;
+      padding: 1em;
+      box-sizing: border-box;
+    }
+
+    /* Ensure ALL elements respect the universal 1em margin */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Prevent any element from extending past the universal margin */
+    *:not(body) {
+      max-width: calc(100vw - 2em) !important;
     }
 
     .logo {
@@ -58,11 +72,13 @@
       user-drag: none;
     }
 
-    /* Ariel logo specific positioning */
+    /* Ariel logo specific positioning - spans columns 6-12, starts at row 2 */
     .logo[src*="Ariel"] {
-      left: auto;
-      right: 0;
-      width: 60%;
+      left: calc(1em + 5 * ((100vw - 13em) / 12 + 1em)); /* Start at column 6 */
+      top: calc(1em + (100vh - 7em) / 6 + 1em); /* Start at row 2 */
+      width: calc((100vw - 13em) / 12 * 7 + 6em); /* 7 columns + 6 gutters */
+      right: auto;
+      padding: 0;
     }
 
     /* Mobile responsive Ariel logo */
@@ -149,8 +165,13 @@
     }
 
     .nav-sublist .nav-sublist li {
-      padding-left: 2em;
+      padding-left: 1em;
       transition-delay: 0.2s;
+    }
+
+    /* Bio content should match the same indentation as Ariel projects (1em) */
+    .bio-item .nav-sublist li {
+      padding-left: 1em;
     }
 
     .nav-sublist .nav-sublist li:nth-child(2) {
@@ -192,6 +213,7 @@
     .project-item:hover {
       color: rgba(0, 0, 0, 0.5);
     }
+
 
     /* Loading state for project items */
     .project-item.loading {
@@ -269,7 +291,7 @@
       height: 100vh;
       background: transparent;
       flex-direction: column;
-      z-index: 1000;
+      z-index: 1700;
     }
 
     .director-portfolio-lightbox[data-active="1"] {
@@ -290,9 +312,9 @@
     }
 
     .director-portfolio-lightbox-media-video {
-      max-width: 75vw;
+      max-width: calc((100vw - 13em) / 12 * 8 + 7em); /* 8 columns + 7 gutters - Desktop/Laptop */
       max-height: calc(100vh - 2em);
-      width: 75vw;
+      width: calc((100vw - 13em) / 12 * 8 + 7em); /* Explicit width to match max-width */
       height: auto;
       object-fit: contain;
       display: block;
@@ -308,6 +330,14 @@
       -moz-user-drag: none;
       -o-user-drag: none;
       user-drag: none;
+    }
+
+    /* Tablet video sizing - 8 columns on tablet grid */
+    @media (max-width: 1279px) and (min-width: 769px) {
+      .director-portfolio-lightbox-media-video {
+        max-width: calc((100vw - 9em) / 8 * 8 + 7em); /* All 8 columns on tablet */
+        width: calc((100vw - 9em) / 8 * 8 + 7em); /* Explicit width to match max-width */
+      }
     }
 
     /* Mobile responsive video sizing */
@@ -423,7 +453,7 @@
       background: transparent;
       display: none;
       flex-direction: column;
-      z-index: 1500;
+      z-index: 400;
       pointer-events: none;
     }
 
@@ -445,9 +475,9 @@
     }
 
     .video-hover-overlay-media-video {
-      max-width: 75vw;
+      max-width: calc((100vw - 13em) / 12 * 8 + 7em); /* 8 columns + 7 gutters - Desktop/Laptop */
       max-height: calc(100vh - 2em);
-      width: 75vw;
+      width: calc((100vw - 13em) / 12 * 8 + 7em); /* Match max-width for images */
       height: auto;
       object-fit: contain;
       display: block;
@@ -463,6 +493,14 @@
       -moz-user-drag: none;
       -o-user-drag: none;
       user-drag: none;
+    }
+
+    /* Tablet hover overlay video sizing - 8 columns on tablet grid */
+    @media (max-width: 1279px) and (min-width: 769px) {
+      .video-hover-overlay-media-video {
+        max-width: calc((100vw - 9em) / 8 * 8 + 7em); /* All 8 columns on tablet */
+        width: calc((100vw - 9em) / 8 * 8 + 7em); /* Match max-width for images */
+      }
     }
 
     /* Mobile responsive hover overlay video sizing */
@@ -511,46 +549,37 @@
       }
     }
 
-    /* Bio text overlay */
-    .bio-text-overlay {
-      position: fixed;
-      top: 1em;
-      left: 1em;
-      width: 25%;
-      background: transparent;
+
+    /* Bio content styling */
+    #bio-content {
+      pointer-events: none; /* Disable all hover/interaction on entire bio content */
+      padding-left: 1em; /* Same indentation as other nav-sublist items */
+    }
+
+    /* Hide all other project items when bio is open */
+    #bio-content.open ~ .project-item:not(.bio-item) {
       display: none;
-      z-index: 1000;
-      pointer-events: none;
     }
-
-    .bio-text-overlay.show {
-      display: block;
-    }
-
-    .bio-text-overlay p {
-      color: #000;
-      font-family: 'Space Mono', monospace;
-      font-size: 18px;
-      line-height: 120%;
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      text-transform: none;
+    
+    #bio-content li p {
       margin: 0;
       padding: 0;
-      opacity: 1;
-      transition: none;
+      max-width: calc((100vw - 13em) / 12 * 6 + 5em); /* 6 columns + 5 gutters - Desktop */
+      cursor: default; /* Show default cursor, not pointer */
+      word-wrap: break-word;
     }
 
-    /* Mobile responsive bio text */
-    @media (max-width: 768px) {
-      .bio-text-overlay {
-        width: 80%;
-        top: 1em;
-        left: 1em;
+    /* Tablet responsive bio text - 8 columns */
+    @media (max-width: 1279px) and (min-width: 769px) {
+      #bio-content li p {
+        max-width: calc((100vw - 9em) / 8 * 6 + 5em); /* 6 columns + 5 gutters - Tablet */
       }
-      
-      .bio-text-overlay p {
-        font-size: 16px;
+    }
+
+    /* Mobile responsive bio text - all columns */
+    @media (max-width: 768px) {
+      #bio-content li p {
+        max-width: calc((100vw - 2em - 1.25em) / 6 * 4 + 3em); /* 4 columns + 3 gutters - Mobile */
       }
     }
 
@@ -566,10 +595,121 @@
       -o-user-drag: none;
       user-drag: none;
     }
+
+    /* Temporary column guides - 12 columns with 1em gutters */
+    .column-guides {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99999;
+      display: block; /* Show guides by default */
+    }
+
+    .column-guides.hidden {
+      display: none;
+    }
+
+    .column-guide {
+      position: absolute;
+      top: 0;
+      height: 100vh;
+      background: rgba(255, 0, 0, 0.1);
+      border-left: 1px solid rgba(255, 0, 0, 0.3);
+      border-right: 1px solid rgba(255, 0, 0, 0.3);
+    }
+
+    /* Row guides - 6 rows with 1em gutters */
+    .row-guide {
+      position: absolute;
+      left: 0;
+      width: 100vw;
+      background: transparent;
+      border-top: 1px solid rgba(0, 150, 255, 1);
+      border-bottom: 1px solid rgba(0, 150, 255, 1);
+    }
+
+    /* 12 columns with 1em gutters - Desktop/Laptop (1280px+) */
+    .column-guide:nth-child(1) { left: 1em; width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(2) { left: calc(1em + (100vw - 13em) / 12 + 1em); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(3) { left: calc(1em + 2 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(4) { left: calc(1em + 3 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(5) { left: calc(1em + 4 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(6) { left: calc(1em + 5 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(7) { left: calc(1em + 6 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(8) { left: calc(1em + 7 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(9) { left: calc(1em + 8 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(10) { left: calc(1em + 9 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(11) { left: calc(1em + 10 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+    .column-guide:nth-child(12) { left: calc(1em + 11 * ((100vw - 13em) / 12 + 1em)); width: calc((100vw - 13em) / 12); }
+
+    /* 8 columns with 1em gutters - Tablet (768px - 1279px) */
+    @media (max-width: 1279px) {
+      .column-guide:nth-child(1) { left: 1em; width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(2) { left: calc(1em + (100vw - 9em) / 8 + 1em); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(3) { left: calc(1em + 2 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(4) { left: calc(1em + 3 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(5) { left: calc(1em + 4 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(6) { left: calc(1em + 5 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(7) { left: calc(1em + 6 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(8) { left: calc(1em + 7 * ((100vw - 9em) / 8 + 1em)); width: calc((100vw - 9em) / 8); }
+      .column-guide:nth-child(9), .column-guide:nth-child(10), .column-guide:nth-child(11), .column-guide:nth-child(12) { display: none; }
+    }
+
+    /* 6 rows with 1em gutters - Desktop/Tablet */
+    .row-guide:nth-child(13) { top: 1em; height: calc((100vh - 7em) / 6); }
+    .row-guide:nth-child(14) { top: calc(1em + (100vh - 7em) / 6 + 1em); height: calc((100vh - 7em) / 6); }
+    .row-guide:nth-child(15) { top: calc(1em + 2 * ((100vh - 7em) / 6 + 1em)); height: calc((100vh - 7em) / 6); }
+    .row-guide:nth-child(16) { top: calc(1em + 3 * ((100vh - 7em) / 6 + 1em)); height: calc((100vh - 7em) / 6); }
+    .row-guide:nth-child(17) { top: calc(1em + 4 * ((100vh - 7em) / 6 + 1em)); height: calc((100vh - 7em) / 6); }
+    .row-guide:nth-child(18) { top: calc(1em + 5 * ((100vh - 7em) / 6 + 1em)); height: calc((100vh - 7em) / 6); }
+
+    /* 6 columns with thinner gutters - Mobile (480px and below) */
+    @media (max-width: 480px) {
+      .column-guide:nth-child(1) { left: 1em; width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(2) { left: calc(1em + (100vw - 2em - 1.25em) / 6 + 0.25em); width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(3) { left: calc(1em + 2 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(4) { left: calc(1em + 3 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(5) { left: calc(1em + 4 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(6) { left: calc(1em + 5 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); width: calc((100vw - 2em - 1.25em) / 6); }
+      .column-guide:nth-child(7), .column-guide:nth-child(8), .column-guide:nth-child(9), .column-guide:nth-child(10), .column-guide:nth-child(11), .column-guide:nth-child(12) { display: none; }
+      
+      /* 6 rows with thinner gutters - Mobile */
+      .row-guide:nth-child(13) { top: 1em; height: calc((100vh - 2em - 1.25em) / 6); }
+      .row-guide:nth-child(14) { top: calc(1em + (100vh - 2em - 1.25em) / 6 + 0.25em); height: calc((100vh - 2em - 1.25em) / 6); }
+      .row-guide:nth-child(15) { top: calc(1em + 2 * ((100vh - 2em - 1.25em) / 6 + 0.25em)); height: calc((100vh - 2em - 1.25em) / 6); }
+      .row-guide:nth-child(16) { top: calc(1em + 3 * ((100vh - 2em - 1.25em) / 6 + 0.25em)); height: calc((100vh - 2em - 1.25em) / 6); }
+      .row-guide:nth-child(17) { top: calc(1em + 4 * ((100vh - 2em - 1.25em) / 6 + 0.25em)); height: calc((100vh - 2em - 1.25em) / 6); }
+      .row-guide:nth-child(18) { top: calc(1em + 5 * ((100vh - 2em - 1.25em) / 6 + 0.25em)); height: calc((100vh - 2em - 1.25em) / 6); }
+    }
   </style>
 </head>
 <body>
   <img src="cousin_logo_HiRes_2.png" alt="COUSIN" class="logo">
+
+  <!-- Temporary column guides - 12 columns with 1em gutters -->
+  <div class="column-guides" id="column-guides">
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="column-guide"></div>
+    <div class="row-guide"></div>
+    <div class="row-guide"></div>
+    <div class="row-guide"></div>
+    <div class="row-guide"></div>
+    <div class="row-guide"></div>
+    <div class="row-guide"></div>
+  </div>
 
   <nav class="nav">
     <ul class="nav-list">
@@ -626,10 +766,6 @@
     <img src="hi.png" alt="Hi">
   </div>
 
-  <!-- Bio text overlay -->
-  <div class="bio-text-overlay" id="bio-text-overlay">
-    <p>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Maecenas faucibus mollis interdum. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-  </div>
 
   <!-- Image hover overlay - shows only image -->
   <div class="video-hover-overlay" data-active="0">
@@ -681,20 +817,27 @@
       const maxContent = document.getElementById('max-projects');
       const contactImageOverlay = document.getElementById('contact-image-overlay');
       
+      // ALWAYS close video first before closing any sections
+      console.log('About clicked - closing video');
+      closeVideoAndReset();
+      
       // Close other main sections AND their sub-sections
       directorsContent.classList.remove('open');
       contactContent.classList.remove('open');
       arielContent.classList.remove('open'); // Also close Ariel Martin
       maxContent.classList.remove('open'); // Also close Max Chan
       
+      // Close bio content if it's open
+      const bioContent = document.getElementById('bio-content');
+      if (bioContent && bioContent.classList.contains('open')) {
+        bioContent.classList.remove('open');
+      }
+      
       // Hide contact image when opening other sections
       contactImageOverlay.classList.remove('show');
       
       // Toggle current section
       content.classList.toggle('open');
-      
-      // Always reset everything when clicking About/Contact/Directors
-      closeVideoAndReset();
       
       // Update logo AFTER everything else is done to prevent glitches
       setTimeout(updateLogo, 10);
@@ -729,12 +872,6 @@
     function closeVideoAndReset() {
       closeVideoPlayer();
       hideVideoHoverOverlay();
-      // Also hide bio text overlay and reset permanently open state
-      const bioOverlay = document.getElementById('bio-text-overlay');
-      if (bioOverlay) {
-        bioOverlay.classList.remove('show');
-        bioOverlay.removeAttribute('data-permanently-open');
-      }
     }
 
     document.getElementById('directors-toggle').addEventListener('click', function(e) {
@@ -745,9 +882,18 @@
       const maxContent = document.getElementById('max-projects');
       const contactImageOverlay = document.getElementById('contact-image-overlay');
       
+      // ALWAYS close video first before closing any sections
+      closeVideoAndReset();
+      
       // Close other main sections
       aboutContent.classList.remove('open');
       contactContent.classList.remove('open');
+      
+      // Close bio content if it's open
+      const bioContent = document.getElementById('bio-content');
+      if (bioContent && bioContent.classList.contains('open')) {
+        bioContent.classList.remove('open');
+      }
       
       // Hide contact image when opening other sections
       contactImageOverlay.classList.remove('show');
@@ -760,9 +906,6 @@
         arielContent.classList.remove('open');
         maxContent.classList.remove('open');
       }
-      
-      // Always reset everything when clicking About/Contact/Directors
-      closeVideoAndReset();
       
       // Update logo AFTER everything else is done to prevent glitches
       setTimeout(updateLogo, 10);
@@ -790,9 +933,6 @@
         setTimeout(() => {
           enableHoverEffects();
         }, 1250);
-      } else {
-        // If ariel section is being closed, reset everything
-        closeVideoAndReset();
       }
     });
 
@@ -831,11 +971,6 @@
       
       // Toggle current section
       content.classList.toggle('open');
-      
-      if (!content.classList.contains('open')) {
-        // If max section is being closed, reset everything
-        closeVideoAndReset();
-      }
     });
 
     document.getElementById('contact-toggle').addEventListener('click', function(e) {
@@ -845,10 +980,19 @@
       const arielContent = document.getElementById('ariel-projects');
       const contactImageOverlay = document.getElementById('contact-image-overlay');
       
+      // ALWAYS close video first before closing any sections
+      closeVideoAndReset();
+      
       // Close other main sections AND their sub-sections
       aboutContent.classList.remove('open');
       directorsContent.classList.remove('open');
       arielContent.classList.remove('open'); // Also close Ariel Martin
+      
+      // Close bio content if it's open
+      const bioContent = document.getElementById('bio-content');
+      if (bioContent && bioContent.classList.contains('open')) {
+        bioContent.classList.remove('open');
+      }
       
       // Toggle current section
       content.classList.toggle('open');
@@ -860,12 +1004,10 @@
         contactImageOverlay.classList.remove('show');
       }
       
-      // Always reset everything when clicking About/Contact/Directors
-      closeVideoAndReset();
-      
       // Update logo visibility AFTER everything else is done to prevent glitches
       setTimeout(updateLogo, 10);
     });
+
 
     // Load CSV data and create project elements
     Papa.parse('ArielMartin.csv', {
@@ -888,6 +1030,12 @@
           // Add hover events
           projectElement.addEventListener('mouseenter', function(e) {
             e.stopPropagation();
+            
+            // Close bio content if it's open when hovering over any video project
+            const bioContent = document.getElementById('bio-content');
+            if (bioContent && bioContent.classList.contains('open')) {
+              bioContent.classList.remove('open');
+            }
             
             // Check if hover effects are enabled
             if (!hoverEffectsEnabled) {
@@ -925,6 +1073,12 @@
           projectElement.addEventListener('click', function(e) {
             e.stopPropagation();
             
+            // Close bio content if it's open when clicking any video project
+            const bioContent = document.getElementById('bio-content');
+            if (bioContent && bioContent.classList.contains('open')) {
+              bioContent.classList.remove('open');
+            }
+            
             const videoSrc = row.Video;
             if (videoSrc) {
               openVideoPlayer(videoSrc);
@@ -934,101 +1088,17 @@
           container.appendChild(projectElement);
         });
 
-        // Add Bio item at the end
-        const bioElement = document.createElement('li');
-        bioElement.className = 'project-item bio-item';
-        bioElement.textContent = 'Bio';
-        bioElement.dataset.bio = 'true';
+        // Bio functionality disabled for now
+        // const bioElement = document.createElement('li');
+        // bioElement.className = 'project-item bio-item';
+        // bioElement.textContent = 'Bio';
+        // bioElement.dataset.bio = 'true';
         
-        // Add hover events for Bio
-        bioElement.addEventListener('mouseenter', function(e) {
-          e.stopPropagation();
-          
-          // Check if hover effects are enabled
-          if (!hoverEffectsEnabled) {
-            return;
-          }
-          
-          // Hide the entire video player when entering bio hover mode
-          const player = document.querySelector('.director-portfolio-lightbox');
-          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
-          if (mainPlayer && !mainPlayer.paused) {
-            mainPlayer.pause();
-            mainPlayer.setAttribute('data-was-playing', 'true');
-            console.log('Main video player paused for bio hover');
-          } else {
-            mainPlayer.setAttribute('data-was-playing', 'false');
-          }
-          
-          // Hide the entire video player overlay
-          player.setAttribute('data-active', '0');
-          
-          const bioOverlay = document.getElementById('bio-text-overlay');
-          bioOverlay.classList.add('show');
-        });
-
-        bioElement.addEventListener('mouseleave', function(e) {
-          e.stopPropagation();
-          
-          const bioOverlay = document.getElementById('bio-text-overlay');
-          
-          // Only hide bio text if it's not permanently open
-          if (bioOverlay.getAttribute('data-permanently-open') !== 'true') {
-            bioOverlay.classList.remove('show');
-          }
-          
-          // Only restore video player if it was playing before bio hover
-          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
-          if (mainPlayer.getAttribute('data-was-playing') === 'true') {
-            const player = document.querySelector('.director-portfolio-lightbox');
-            
-            // Show the video player again
-            player.setAttribute('data-active', '1');
-            
-            // Show controls
-            const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
-            const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
-            if (playbar) playbar.classList.add('show');
-            if (controls) controls.classList.add('show');
-            
-            // Resume video
-            mainPlayer.play();
-            console.log('Main video player restored and resumed after bio hover');
-          }
-        });
-        
-        // Add click event for Bio - open bio text permanently (like videos)
-        bioElement.addEventListener('click', function(e) {
-          e.stopPropagation();
-          
-          const bioOverlay = document.getElementById('bio-text-overlay');
-          
-          // Open bio text permanently (like opening a video)
-          bioOverlay.classList.add('show');
-          
-          // Mark bio as permanently open
-          bioOverlay.setAttribute('data-permanently-open', 'true');
-          
-          // If there was a video playing before, restore it
-          const mainPlayer = document.querySelector('.director-portfolio-lightbox-media-video');
-          if (mainPlayer.getAttribute('data-was-playing') === 'true') {
-            const player = document.querySelector('.director-portfolio-lightbox');
-            
-            // Show the video player again
-            player.setAttribute('data-active', '1');
-            
-            // Show controls
-            const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
-            const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
-            if (playbar) playbar.classList.add('show');
-            if (controls) controls.classList.add('show');
-            
-            // Resume video
-            mainPlayer.play();
-          }
-        });
-        
-        container.appendChild(bioElement);
+        // Bio functionality disabled for now
+        // bioElement.addEventListener('click', function(e) {
+        //   // ... entire bio click handler commented out
+        // });
+        // container.appendChild(bioElement);
       }
     });
 
@@ -1078,7 +1148,12 @@
         mainPlayer.setAttribute('data-was-playing', 'false');
       }
       
-      // Hide controls and UI when entering hover mode
+      // Hide the entire video player when entering hover mode
+      const player = document.querySelector('.director-portfolio-lightbox');
+      player.setAttribute('data-active', '0');
+      player.style.display = 'none'; // Force hide with CSS
+      console.log('Video player hidden for rollover');
+      
       const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
       const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
       if (playbar) playbar.classList.remove('show');
@@ -1086,12 +1161,20 @@
       
       // Convert video path to image path
       let imageSrc;
-      if (videoSrc.includes('KIA_SNIPPET.mp4')) {
-        imageSrc = 'Ariel_Martin/Kia_optimized.png';
-      } else if (videoSrc.includes('WAPOLICE-SNIPPET.mp4')) {
-        imageSrc = 'Ariel_Martin/WA_police_optimized.png';
-      } else if (videoSrc.includes('VODA_SNIPPET.mp4')) {
-        imageSrc = 'Ariel_Martin/Vodafone_optimized.png';
+      if (videoSrc.includes('Prime_CricketWorldCup.mp4')) {
+        imageSrc = 'Ariel_Martin/Prime_CricketWorldCup_optimized.png';
+      } else if (videoSrc.includes('Vodafone_DoubleCoverage.mp4')) {
+        imageSrc = 'Ariel_Martin/Vodafone_DoubleCoverage_optimized.png';
+      } else if (videoSrc.includes('KIA_TheUte.mp4')) {
+        imageSrc = 'Ariel_Martin/KIA_TheUte_optimized.png';
+      } else if (videoSrc.includes('GWM_OutThereAwaits.mp4')) {
+        imageSrc = 'Ariel_Martin/GWM_OutThereAwaits_optimized.png';
+      } else if (videoSrc.includes('BALTER_BeersDoComeTrue.mp4')) {
+        imageSrc = 'Ariel_Martin/BALTER_BeersDoComeTrue_optimized.png';
+      } else if (videoSrc.includes('MAS_TheOverthinkermp4.mp4')) {
+        imageSrc = 'Ariel_Martin/MAS_TheOverthinkermp4_optimized.png';
+      } else if (videoSrc.includes('WAPOLICE-LetsJoinTheForces.mp4')) {
+        imageSrc = 'Ariel_Martin/WAPOLICE-LetsJoinTheForces_optimized.png';
       }
       
       img.src = imageSrc;
@@ -1109,18 +1192,25 @@
       overlay.setAttribute('data-active', '0');
       overlay.style.opacity = '1'; // Reset opacity for next hover
       
-      // If video player is active, restore the controls and resume if it was playing
-      if (player.getAttribute('data-active') === '1') {
+      // Show the video player again if it was playing
+      if (mainPlayer.getAttribute('data-was-playing') === 'true') {
+        player.setAttribute('data-active', '1');
+        player.style.display = 'flex'; // Reset display style
+        
         const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
         const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
-        if (playbar) playbar.classList.add('show');
-        if (controls) controls.classList.add('show');
+        if (playbar) {
+          playbar.classList.add('show');
+          playbar.style.display = ''; // Reset display style
+        }
+        if (controls) {
+          controls.classList.add('show');
+          controls.style.display = ''; // Reset display style
+        }
         
         // Resume video if it was playing before hover
-        if (mainPlayer.getAttribute('data-was-playing') === 'true') {
-          mainPlayer.play();
-          console.log('Main video player resumed');
-        }
+        mainPlayer.play();
+        console.log('Main video player resumed and shown');
       }
     }
 
@@ -1132,7 +1222,9 @@
       const videoSource = player.querySelector('.director-portfolio-lightbox-media-video source');
       const videoElement = player.querySelector('.director-portfolio-lightbox-media-video');
       
+      // Restore video source
       videoSource.src = videoSrc;
+      videoElement.src = videoSrc; // Also set the video element's src directly
       
       // Set poster image based on video
       if (videoSrc.includes('KIA_SNIPPET.mp4')) {
@@ -1148,8 +1240,12 @@
       // Reset video to beginning
       videoElement.currentTime = 0;
       
-      // Show the video player
+      // Show the video player - reset ALL CSS properties
       player.setAttribute('data-active', '1');
+      player.style.setProperty('display', 'flex', 'important'); // Reset display style
+      player.style.setProperty('visibility', 'visible', 'important'); // Reset visibility
+      player.style.setProperty('opacity', '1', 'important'); // Reset opacity
+      player.style.setProperty('z-index', '1700', 'important'); // Reset z-index
       
       // Auto play video
       videoElement.play();
@@ -1165,8 +1261,14 @@
       setTimeout(() => {
         const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
         const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
-        playbar.classList.add('show');
-        controls.classList.add('show');
+        if (playbar) {
+          playbar.style.display = ''; // Reset display style
+          playbar.classList.add('show');
+        }
+        if (controls) {
+          controls.style.display = ''; // Reset display style
+          controls.classList.add('show');
+        }
       }, 500);
       
       // Update button states - show pause button since video autoplays
@@ -1179,10 +1281,56 @@
     function closeVideoPlayer() {
       const player = document.querySelector('.director-portfolio-lightbox');
       const video = player.querySelector('.director-portfolio-lightbox-media-video');
+      const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+      const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
       
-      video.pause();
-      video.currentTime = 0;
+      console.log('Closing video player...');
+      
+      // Force stop video completely
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+        video.src = ''; // Remove video source completely
+        video.load(); // Force reload to stop any buffering
+        console.log('Video completely stopped and source removed');
+      }
+      
+      // Force hide player with !important to override CSS
       player.setAttribute('data-active', '0');
+      player.style.setProperty('display', 'none', 'important'); // Force hide with !important
+      player.style.setProperty('visibility', 'hidden', 'important'); // Also hide visibility
+      player.style.setProperty('opacity', '0', 'important'); // And opacity
+      player.style.setProperty('z-index', '-1', 'important'); // Move behind everything
+      console.log('Video player aggressively hidden');
+      
+      // Note: Playbar and controls should be hidden by parent container
+      // but let's ensure they're not visible
+      if (playbar) {
+        playbar.classList.remove('show');
+        console.log('Playbar classes removed');
+      }
+      if (controls) {
+        controls.classList.remove('show');
+        console.log('Controls classes removed');
+      }
+      
+      // Reset button states
+      const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+      const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+      if (playBtn) playBtn.setAttribute('data-active', '1');
+      if (pauseBtn) pauseBtn.setAttribute('data-active', '0');
+      
+      // Keep player in DOM but aggressively hide it
+      
+      // AGGRESSIVE: Hide ALL video-related elements
+      const allVideoElements = document.querySelectorAll('.director-portfolio-lightbox, .director-portfolio-lightbox-media-playbar, .director-portfolio-lightbox-video-controls');
+      allVideoElements.forEach(element => {
+        element.style.display = 'none';
+        element.setAttribute('data-active', '0');
+      });
+      console.log('All video elements aggressively hidden');
+      
+      console.log('Video player completely closed');
     }
 
     function toggleFullscreen() {
@@ -1310,6 +1458,14 @@
       // Handle window resize for logo updates
       window.addEventListener('resize', function() {
         updateLogo();
+      });
+
+      // Toggle column guides with 'G' key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'g' || e.key === 'G') {
+          const guides = document.getElementById('column-guides');
+          guides.classList.toggle('hidden');
+        }
       });
     });
 
