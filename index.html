@@ -42,6 +42,30 @@
       max-width: calc(100vw - 2em) !important;
     }
 
+    /* Selective case mode - when 'C' key toggles to Title Case */
+    body.selective-case {
+      text-transform: none;
+    }
+
+    /* Keep nav items uppercase in selective mode */
+    body.selective-case .nav-toggle {
+      text-transform: uppercase !important;
+    }
+
+    /* Keep contact labels uppercase, values in sentence case */
+    body.selective-case .contact-label {
+      text-transform: uppercase !important;
+    }
+
+    body.selective-case .contact-value {
+      text-transform: capitalize !important;
+    }
+
+    /* Force Title Case for Ariel Martin projects in selective mode */
+    body.selective-case .project-item {
+      text-transform: capitalize !important;
+    }
+
     .logo {
       position: fixed;
       top: 1em;
@@ -74,12 +98,12 @@
       padding: 0;
     }
 
-    /* Tablet responsive Ariel logo (8 columns) */
+    /* Tablet responsive Ariel logo (8 columns) - span columns 4-8 */
     @media (max-width: 1279px) and (min-width: 769px) {
       .logo[src*="Ariel"] {
-        left: 1em; /* Start at left margin */
-        width: calc(100vw - 2em); /* Full width within margins */
-        right: 1em; /* End at right margin */
+        left: calc(1em + 3 * ((100vw - 9em) / 8 + 1em)); /* Start at column 4 */
+        width: calc((100vw - 9em) / 8 * 5 + 4em); /* 5 columns (4-8) + 4 gutters */
+        right: auto;
       }
     }
 
@@ -696,9 +720,12 @@
       <li class="nav-item">
         <div id="contact-toggle" class="nav-toggle">Contact</div>
         <ul id="contact-content" class="nav-sublist">
-          <li><a href="mailto:nick@cousin.site">nick@cousin.site</a></li>
-          <li><a href="tel:+61415064495">+61 415 064 495</a></li>
-          <li><a href="https://www.instagram.com/cousin_presents/" target="_blank">Instagram</a></li>
+          <li><span class="contact-label">EP & FOUNDER:</span> <span class="contact-value">Nick Simkins</span></li>
+          <li><span class="contact-label">PHONE:</span> <a href="tel:+61415064495" class="contact-value">+61 415 064 495</a></li>
+          <li><span class="contact-label">EMAIL:</span> <a href="mailto:nick@cousin.site" class="contact-value">nick@cousin.site</a></li>
+          <li><span class="contact-label">HISTORY:</span> <a href="https://nicksimkins.co" target="_blank" class="contact-value">nicksimkins.co</a></li>
+          <li><br></li>
+          <li><span class="contact-label">INSTA:</span> <a href="https://www.instagram.com/cousin_presents/" target="_blank" class="contact-value">@Cousin_presents</a></li>
         </ul>
       </li>
     </ul>
@@ -817,6 +844,9 @@
       hideVideoHoverOverlay();
     }
 
+    // Flag to prevent hover effects right after opening directors
+    let hoverDelayActive = false;
+
     document.getElementById('directors-toggle').addEventListener('click', function(e) {
       const content = document.getElementById('directors-content');
       const aboutContent = document.getElementById('about-content');
@@ -843,6 +873,19 @@
       
       // Toggle current section
       content.classList.toggle('open');
+      
+      // If opening directors, wait for animation to finish (300ms), then disable hover effects for 500ms
+      if (content.classList.contains('open')) {
+        hoverDelayActive = true;
+        console.log('Directors expanding...');
+        setTimeout(() => {
+          console.log('Directors expanded - starting 500ms hover delay');
+          setTimeout(() => {
+            hoverDelayActive = false;
+            console.log('Hover effects now active');
+          }, 500);
+        }, 300); // Wait for expansion animation to complete
+      }
       
       // If directors section is being closed, also close sub-sections
       if (!content.classList.contains('open')) {
@@ -979,6 +1022,11 @@
           // Add hover events
           projectElement.addEventListener('mouseenter', function(e) {
             e.stopPropagation();
+            
+            // Ignore hover if delay is active (right after opening directors)
+            if (hoverDelayActive) {
+              return;
+            }
             
             // Close bio content if it's open when hovering over any video project
             const bioContent = document.getElementById('bio-content');
@@ -1410,13 +1458,17 @@
     let isTitleCase = false; // Start with UPPERCASE (default)
 
     function updateTextCase() {
+      const body = document.body;
+      
       if (isTitleCase) {
-        // Switch to Title Case
-        document.body.style.textTransform = 'capitalize';
-        console.log('Title Case Mode');
+        // Switch to selective Title Case mode
+        body.style.textTransform = 'none'; // Remove global uppercase
+        body.classList.add('selective-case');
+        console.log('Selective Title Case Mode');
       } else {
-        // Switch to UPPERCASE
-        document.body.style.textTransform = 'uppercase';
+        // Switch to UPPERCASE (default)
+        body.style.textTransform = 'uppercase';
+        body.classList.remove('selective-case');
         console.log('UPPERCASE Mode');
       }
     }
