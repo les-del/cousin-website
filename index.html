@@ -6,8 +6,6 @@
   <title>Cousin</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="components.js"></script>
   <style>
     * {
       margin: 0;
@@ -33,16 +31,11 @@
       font-weight: 400;
       letter-spacing: -0.02em;
       text-transform: uppercase;
-      /* UNIVERSAL 1EM MARGIN - NEVER TO BE VIOLATED */
-      margin: 0;
-      padding: 1em;
-      box-sizing: border-box;
-    }
-
-    /* Ensure ALL elements respect the universal 1em margin */
-    * {
-      box-sizing: border-box;
-    }
+    /* UNIVERSAL 1EM MARGIN - NEVER TO BE VIOLATED */
+    margin: 0;
+    padding: 1em;
+    box-sizing: border-box;
+  }
 
     /* Prevent any element from extending past the universal margin */
     *:not(body) {
@@ -1037,11 +1030,6 @@
               bioContent.classList.remove('open');
             }
             
-            // Check if hover effects are enabled
-            if (!hoverEffectsEnabled) {
-              return;
-            }
-            
             const player = document.querySelector('.director-portfolio-lightbox');
             const videoSrc = row.Video;
             
@@ -1101,37 +1089,6 @@
         // container.appendChild(bioElement);
       }
     });
-
-    // Hover effects control
-    let hoverEffectsEnabled = true;
-    
-    function disableHoverEffects() {
-      hoverEffectsEnabled = false;
-      console.log('Hover effects disabled');
-      
-      // Add loading state to project items and body
-      const projectItems = document.querySelectorAll('.project-item');
-      projectItems.forEach(item => {
-        item.classList.add('loading');
-      });
-      
-      // Add loading cursor to entire body
-      document.body.classList.add('loading');
-    }
-    
-    function enableHoverEffects() {
-      hoverEffectsEnabled = true;
-      console.log('Hover effects enabled');
-      
-      // Remove loading state from project items and body
-      const projectItems = document.querySelectorAll('.project-item');
-      projectItems.forEach(item => {
-        item.classList.remove('loading');
-      });
-      
-      // Remove loading cursor from body
-      document.body.classList.remove('loading');
-    }
 
     // Image hover overlay functions
     function showVideoHoverOverlay(videoSrc) {
@@ -1226,15 +1183,6 @@
       videoSource.src = videoSrc;
       videoElement.src = videoSrc; // Also set the video element's src directly
       
-      // Set poster image based on video
-      if (videoSrc.includes('KIA_SNIPPET.mp4')) {
-        videoElement.poster = 'Ariel_Martin/Kia_optimized.png';
-      } else if (videoSrc.includes('WAPOLICE-SNIPPET.mp4')) {
-        videoElement.poster = 'Ariel_Martin/WA_police_optimized.png';
-      } else if (videoSrc.includes('VODA_SNIPPET.mp4')) {
-        videoElement.poster = 'Ariel_Martin/Vodafone_optimized.png';
-      }
-      
       videoElement.load();
       
       // Reset video to beginning
@@ -1319,16 +1267,6 @@
       const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
       if (playBtn) playBtn.setAttribute('data-active', '1');
       if (pauseBtn) pauseBtn.setAttribute('data-active', '0');
-      
-      // Keep player in DOM but aggressively hide it
-      
-      // AGGRESSIVE: Hide ALL video-related elements
-      const allVideoElements = document.querySelectorAll('.director-portfolio-lightbox, .director-portfolio-lightbox-media-playbar, .director-portfolio-lightbox-video-controls');
-      allVideoElements.forEach(element => {
-        element.style.display = 'none';
-        element.setAttribute('data-active', '0');
-      });
-      console.log('All video elements aggressively hidden');
       
       console.log('Video player completely closed');
     }
