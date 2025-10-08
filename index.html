@@ -1172,8 +1172,7 @@
     }
 
     function openVideoPlayer(videoSrc) {
-      // Hide hover overlay first
-      hideVideoHoverOverlay();
+      // DON'T hide hover overlay yet - keep it visible while video loads
       
       const player = document.querySelector('.director-portfolio-lightbox');
       const videoSource = player.querySelector('.director-portfolio-lightbox-media-video source');
@@ -1183,47 +1182,61 @@
       videoSource.src = videoSrc;
       videoElement.src = videoSrc; // Also set the video element's src directly
       
-      videoElement.load();
-      
       // Reset video to beginning
       videoElement.currentTime = 0;
       
-      // Show the video player - reset ALL CSS properties
-      player.setAttribute('data-active', '1');
-      player.style.setProperty('display', 'flex', 'important'); // Reset display style
-      player.style.setProperty('visibility', 'visible', 'important'); // Reset visibility
-      player.style.setProperty('opacity', '1', 'important'); // Reset opacity
-      player.style.setProperty('z-index', '1700', 'important'); // Reset z-index
+      // Keep player HIDDEN until video is loaded
+      player.setAttribute('data-active', '0');
+      player.style.setProperty('display', 'none', 'important');
+      console.log('Loading video... rollover stays visible');
       
-      // Auto play video
-      videoElement.play();
-      updateTimeDisplay();
-      
-      // Reset progress bar
-      const progressBar = document.querySelector('.director-portfolio-lightbox-media-playbar-meter-progress');
-      if (progressBar) {
-        progressBar.style.width = '0%';
-      }
-      
-      // Show controls after a short delay
-      setTimeout(() => {
+      // Wait for video to have enough data before showing
+      videoElement.addEventListener('loadeddata', function onVideoLoaded() {
+        console.log('Video loaded, hiding rollover and showing player');
+        
+        // NOW hide the hover overlay since video is ready
+        hideVideoHoverOverlay();
+        
+        // Now show the video player - reset ALL CSS properties
+        player.setAttribute('data-active', '1');
+        player.style.setProperty('display', 'flex', 'important');
+        player.style.setProperty('visibility', 'visible', 'important');
+        player.style.setProperty('opacity', '1', 'important');
+        player.style.setProperty('z-index', '1700', 'important');
+        
+        // Auto play video
+        videoElement.play();
+        updateTimeDisplay();
+        
+        // Reset progress bar
+        const progressBar = document.querySelector('.director-portfolio-lightbox-media-playbar-meter-progress');
+        if (progressBar) {
+          progressBar.style.width = '0%';
+        }
+        
+        // Show controls immediately (no delay since video is loaded)
         const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
         const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
         if (playbar) {
-          playbar.style.display = ''; // Reset display style
+          playbar.style.display = '';
           playbar.classList.add('show');
         }
         if (controls) {
-          controls.style.display = ''; // Reset display style
+          controls.style.display = '';
           controls.classList.add('show');
         }
-      }, 500);
+        
+        // Update button states - show pause button since video autoplays
+        const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
+        const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
+        playBtn.setAttribute('data-active', '0');
+        pauseBtn.setAttribute('data-active', '1');
+        
+        // Remove event listener to avoid memory leaks
+        videoElement.removeEventListener('loadeddata', onVideoLoaded);
+      }, { once: true }); // Use 'once' option to auto-remove listener
       
-      // Update button states - show pause button since video autoplays
-      const playBtn = document.querySelector('.director-portfolio-lightbox-controls-play');
-      const pauseBtn = document.querySelector('.director-portfolio-lightbox-controls-pause');
-      playBtn.setAttribute('data-active', '0');
-      pauseBtn.setAttribute('data-active', '1');
+      videoElement.load();
     }
 
     function closeVideoPlayer() {
