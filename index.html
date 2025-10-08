@@ -44,11 +44,11 @@
 
     .logo {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
+      top: 1em;
+      left: 1em;
+      width: calc(100vw - 2em); /* Full 12 columns within body padding */
       height: auto;
-      padding: 1em;
+      padding: 0;
       z-index: 500;
       pointer-events: none;
       mix-blend-mode: multiply;
@@ -70,16 +70,25 @@
       left: calc(1em + 5 * ((100vw - 13em) / 12 + 1em)); /* Start at column 6 */
       top: calc(1em + (100vh - 7em) / 6 + 1em); /* Start at row 2 */
       width: calc((100vw - 13em) / 12 * 7 + 6em); /* 7 columns + 6 gutters */
-      right: auto;
+      right: 1em; /* Respect right margin */
       padding: 0;
     }
 
-    /* Mobile responsive Ariel logo */
+    /* Tablet responsive Ariel logo (8 columns) */
+    @media (max-width: 1279px) and (min-width: 769px) {
+      .logo[src*="Ariel"] {
+        left: 1em; /* Start at left margin */
+        width: calc(100vw - 2em); /* Full width within margins */
+        right: 1em; /* End at right margin */
+      }
+    }
+
+    /* Mobile responsive Ariel logo (6 columns) */
     @media (max-width: 768px) {
       .logo[src*="Ariel"] {
-        width: 100%;
-        left: 0;
-        right: 0;
+        left: 1em; /* Start at left margin */
+        width: calc(100vw - 2em); /* Full width within margins */
+        right: 1em; /* End at right margin */
       }
     }
 
@@ -222,57 +231,6 @@
     body.loading * {
       cursor: wait !important;
     }
-
-    /* Director Toggle */
-    .director-toggle {
-      position: fixed;
-      bottom: 1em;
-      right: 1em;
-      z-index: 2000;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.1s ease, transform 0.1s ease;
-      pointer-events: none;
-      background: rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(0, 0, 0, 0.2);
-      border-radius: 20px;
-      padding: 0.5em 1em;
-      cursor: pointer;
-      font-family: 'Space Mono', monospace;
-      font-size: 14px;
-      color: #000;
-      text-transform: uppercase;
-      letter-spacing: -0.02em;
-      user-select: none;
-    }
-
-    .director-toggle.visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .director-toggle:hover {
-      background: rgba(0, 0, 0, 0.2);
-      border-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .director-toggle.active {
-      background: #000;
-      color: #fff;
-    }
-
-    /* Hover trigger area in bottom right corner */
-    .toggle-trigger-area {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 100px;
-      height: 100px;
-      z-index: 1999;
-      pointer-events: auto;
-    }
-
 
     /* Video Player */
     .director-portfolio-lightbox {
@@ -508,27 +466,23 @@
     /* Contact image overlay */
     .contact-image-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      /* Span columns 2-3: start at column 2, span 2 columns */
+      left: calc(1em + 1 * ((100vw - 13em) / 12 + 1em)); /* Start at column 2 */
+      width: calc((100vw - 13em) / 12 * 2 + 1em); /* 2 columns + 1 gutter */
+      /* Start at row 3 */
+      top: calc(1em + 2 * ((100vh - 7em) / 6 + 1em)); /* Start at row 3 (0-indexed, so row 3 = index 2) */
       background: transparent;
       display: none;
-      align-items: center;
-      justify-content: flex-end;
-      padding-right: 5%;
       z-index: 1000;
       pointer-events: none;
     }
 
     .contact-image-overlay.show {
-      display: flex;
+      display: block;
     }
 
     .contact-image-overlay img {
-      max-width: 230px;
-      max-height: 230px;
-      width: auto;
+      width: 100%;
       height: auto;
       opacity: 1;
       transition: none;
@@ -536,9 +490,11 @@
 
     /* Mobile responsive contact image */
     @media (max-width: 768px) {
-      .contact-image-overlay img {
-        max-width: 173px;
-        max-height: 173px;
+      .contact-image-overlay {
+        /* On mobile, use simpler positioning */
+        left: 1em;
+        width: calc((100vw - 2em) / 3); /* Roughly 2 columns on mobile 6-col grid */
+        top: calc(1em + 2 * ((100vh - 7em) / 6 + 1em)); /* Still row 3 */
       }
     }
 
@@ -683,7 +639,7 @@
   <img src="cousin_logo_HiRes_2.png" alt="COUSIN" class="logo">
 
   <!-- Temporary column guides - 12 columns with 1em gutters -->
-  <div class="column-guides" id="column-guides">
+  <div class="column-guides hidden" id="column-guides">
     <div class="column-guide"></div>
     <div class="column-guide"></div>
     <div class="column-guide"></div>
@@ -747,12 +703,6 @@
       </li>
     </ul>
   </nav>
-
-  <!-- Toggle trigger area and switch -->
-  <div class="toggle-trigger-area" id="toggle-trigger-area"></div>
-  <div class="director-toggle" id="director-toggle">
-    <span id="toggle-text">Single Director</span>
-  </div>
 
   <!-- Contact image overlay -->
   <div class="contact-image-overlay" id="contact-image-overlay">
@@ -907,6 +857,12 @@
     document.getElementById('ariel-toggle').addEventListener('click', function(e) {
       const content = document.getElementById('ariel-projects');
       const maxContent = document.getElementById('max-projects');
+      
+      // If Ariel is currently open and we're about to close it, close any playing video
+      if (content.classList.contains('open')) {
+        closeVideoAndReset(); // Close video before collapsing
+        console.log('Ariel collapsing - closing video');
+      }
       
       // Close Max Chan if it's open and reset any playing video
       if (maxContent.classList.contains('open')) {
@@ -1403,78 +1359,65 @@
         return false;
       });
 
-      // Director toggle functionality
-      initializeDirectorToggle();
 
       // Handle window resize for logo updates
       window.addEventListener('resize', function() {
         updateLogo();
       });
 
-      // Toggle column guides with 'G' key
+      // Keyboard shortcuts
       document.addEventListener('keydown', function(e) {
+        // Toggle column guides with 'G' key
         if (e.key === 'g' || e.key === 'G') {
           const guides = document.getElementById('column-guides');
           guides.classList.toggle('hidden');
         }
+        
+        // Toggle capitalization with 'C' key
+        if (e.key === 'c' || e.key === 'C') {
+          isTitleCase = !isTitleCase;
+          updateTextCase();
+        }
+        
+        // Toggle director mode with 'D' key
+        if (e.key === 'd' || e.key === 'D') {
+          isMultiDirectorMode = !isMultiDirectorMode;
+          updateDirectorMode();
+        }
       });
     });
 
-    // Director toggle state
+    // Director mode state (toggled with 'D' key)
     let isMultiDirectorMode = false;
-
-    function initializeDirectorToggle() {
-      const triggerArea = document.getElementById('toggle-trigger-area');
-      const toggle = document.getElementById('director-toggle');
-      const toggleText = document.getElementById('toggle-text');
-
-      // Show toggle when hovering over trigger area
-      triggerArea.addEventListener('mouseenter', function() {
-        toggle.classList.add('visible');
-      });
-
-      // Hide toggle when leaving trigger area (unless hovering over toggle itself)
-      triggerArea.addEventListener('mouseleave', function(e) {
-        // Check if mouse is moving to the toggle element
-        if (!toggle.contains(e.relatedTarget)) {
-          toggle.classList.remove('visible');
-        }
-      });
-
-      // Keep toggle visible when hovering over it
-      toggle.addEventListener('mouseenter', function() {
-        toggle.classList.add('visible');
-      });
-
-      // Hide toggle when leaving it
-      toggle.addEventListener('mouseleave', function() {
-        toggle.classList.remove('visible');
-      });
-
-      // Toggle functionality
-      toggle.addEventListener('click', function() {
-        isMultiDirectorMode = !isMultiDirectorMode;
-        updateDirectorMode();
-      });
-    }
 
     function updateDirectorMode() {
       const maxDirector = document.getElementById('max-director');
-      const toggleText = document.getElementById('toggle-text');
-      const toggle = document.getElementById('director-toggle');
 
       if (isMultiDirectorMode) {
         // Show Max Chan director
         maxDirector.style.display = 'block';
-        toggleText.textContent = 'Multi Director';
-        toggle.classList.add('active');
+        console.log('Multi Director Mode');
       } else {
         // Hide Max Chan director and close its submenu if open
         maxDirector.style.display = 'none';
         const maxProjects = document.getElementById('max-projects');
         maxProjects.classList.remove('open');
-        toggleText.textContent = 'Single Director';
-        toggle.classList.remove('active');
+        console.log('Single Director Mode');
+      }
+    }
+
+    // Case toggle state (toggled with 'C' key)
+    let isTitleCase = false; // Start with UPPERCASE (default)
+
+    function updateTextCase() {
+      if (isTitleCase) {
+        // Switch to Title Case
+        document.body.style.textTransform = 'capitalize';
+        console.log('Title Case Mode');
+      } else {
+        // Switch to UPPERCASE
+        document.body.style.textTransform = 'uppercase';
+        console.log('UPPERCASE Mode');
       }
     }
   </script>
