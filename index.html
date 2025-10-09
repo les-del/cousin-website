@@ -715,6 +715,23 @@
       .row-guide:nth-child(18) { top: calc(1em + 5 * ((100vh - 2em - 1.25em) / 6 + 0.25em)); height: calc((100vh - 2em - 1.25em) / 6); }
     }
   </style>
+  
+  <!-- Preload all loader images -->
+  <link rel="preload" href="assets/loader/alt_2/0.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/6.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/13.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/20.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/27.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/35.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/42.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/49.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/56.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/63.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/71.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/78.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/85.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/93.png" as="image">
+  <link rel="preload" href="assets/loader/alt_2/100.png" as="image">
 </head>
 <body>
   <!-- Site Loader -->
@@ -934,9 +951,26 @@
         }
       }
 
-      // Start the loader (shorter initial delay for returning visitors)
-      const initialDelay = hasVisited ? 250 : 500;
-      setTimeout(animateLoader, initialDelay);
+      // Preload all images first to prevent flashing
+      const imagesToPreload = availablePercentages.map(p => `assets/loader/alt_2/${p}.png`);
+      let loadedCount = 0;
+      
+      function startWhenReady() {
+        const initialDelay = hasVisited ? 250 : 500;
+        setTimeout(animateLoader, initialDelay);
+      }
+      
+      // Preload images
+      imagesToPreload.forEach(src => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          loadedCount++;
+          if (loadedCount === imagesToPreload.length) {
+            startWhenReady();
+          }
+        };
+        img.src = src;
+      });
     })();
 
     // ==========================================
