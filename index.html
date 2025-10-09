@@ -82,11 +82,11 @@
       }
     }
 
-    /* Mobile responsive loader - spans columns 2-6 (5 columns total) */
-    @media (max-width: 480px) {
+    /* Mobile responsive loader - spans 5 columns width within mobile grid */
+    @media (max-width: 768px) {
       .loader-container {
-        left: calc(1em + 1 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); /* Start at column 2 */
-        width: calc(4 * ((100vw - 2em - 1.25em) / 6 + 0.25em) + (100vw - 2em - 1.25em) / 6); /* Span columns 2-6 (5 columns) */
+        left: 1em; /* Start at left margin */
+        width: calc((100vw - 2em - 1.25em) / 6 * 5 + 4 * 0.25em); /* 5 columns + 4 gutters */
       }
     }
 
@@ -96,6 +96,27 @@
       display: block;
       /* PNG can use full container width (5 columns) */
       max-width: 100%; /* Use full container width */
+      /* Add slight curve/contrast to make 5% blacker */
+      filter: brightness(0.95) contrast(1.05);
+    }
+
+    /* Make 100% loader image 25% larger on desktop only */
+    .loader-digit[src*="100.png"] {
+      max-width: 125%; /* Allow it to be 25% larger than container */
+      width: 125%; /* Explicit width to match max-width */
+      transform: scale(1.25);
+    }
+
+    /* 100% image spans full 6 columns on mobile */
+    @media (max-width: 768px) {
+      .loader-digit[src*="100.png"] {
+        position: fixed;
+        left: 1em; /* Start at left margin */
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%); /* Perfect vertical centering */
+        width: calc(100vw - 2em); /* Full width minus margins (6 columns) */
+        max-width: none; /* Override container constraints */
+      }
     }
 
     /* Selective case mode - when 'C' key toggles to Title Case */
