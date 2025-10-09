@@ -38,8 +38,64 @@
   }
 
     /* Prevent any element from extending past the universal margin */
-    *:not(body) {
+    *:not(body):not(#site-loader):not(#site-loader *) {
       max-width: calc(100vw - 2em) !important;
+    }
+
+    /* Loader styles */
+    #site-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    #site-loader.hidden {
+      display: none;
+    }
+
+    /* Loader positioning - Desktop: spans columns 5-7 (3 columns total) */
+    .loader-container {
+      position: fixed;
+      left: calc(1em + 4 * ((100vw - 13em) / 12 + 1em)); /* Start at column 5 */
+      width: calc(2 * ((100vw - 13em) / 12 + 1em) + (100vw - 13em) / 12); /* Span columns 5-7 (3 columns) */
+      top: calc(1em + 2 * ((100vh - 7em) / 6 + 1em)); /* Start at row 3 */
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tablet responsive loader - spans columns 3-6 (4 columns total) */
+    @media (max-width: 1279px) and (min-width: 769px) {
+      .loader-container {
+        left: calc(1em + 2 * ((100vw - 9em) / 8 + 1em)); /* Start at column 3 */
+        width: calc(3 * ((100vw - 9em) / 8 + 1em) + (100vw - 9em) / 8); /* Span columns 3-6 (4 columns) */
+      }
+    }
+
+    /* Mobile responsive loader - spans columns 2-6 (5 columns total) */
+    @media (max-width: 480px) {
+      .loader-container {
+        left: calc(1em + 1 * ((100vw - 2em - 1.25em) / 6 + 0.25em)); /* Start at column 2 */
+        width: calc(4 * ((100vw - 2em - 1.25em) / 6 + 0.25em) + (100vw - 2em - 1.25em) / 6); /* Span columns 2-6 (5 columns) */
+      }
+    }
+
+    .loader-digit {
+      height: auto;
+      width: auto;
+      display: block;
+      /* PNG can use full container width (5 columns) */
+      max-width: 100%; /* Use full container width */
     }
 
     /* Selective case mode - when 'C' key toggles to Title Case */
@@ -512,6 +568,7 @@
       transition: none;
     }
 
+
     /* Mobile responsive contact image */
     @media (max-width: 768px) {
       .contact-image-overlay {
@@ -660,7 +717,14 @@
   </style>
 </head>
 <body>
-  <img src="cousin_logo_HiRes_2.png" alt="COUSIN" class="logo">
+  <!-- Site Loader -->
+  <div id="site-loader">
+    <div class="loader-container" id="loader">
+      <!-- Loader images will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <img src="assets/images/logos/cousin_logo_HiRes_2.png" alt="COUSIN" class="logo">
 
   <!-- Temporary column guides - 12 columns with 1em gutters -->
   <div class="column-guides hidden" id="column-guides">
@@ -733,7 +797,7 @@
 
   <!-- Contact image overlay -->
   <div class="contact-image-overlay" id="contact-image-overlay">
-    <img src="hi.png" alt="Hi">
+    <img src="assets/images/contact/hi.png" alt="Hi">
   </div>
 
 
@@ -778,6 +842,136 @@
   </div>
 
   <script>
+    // ==========================================
+    // SITE LOADER
+    // ==========================================
+    (function() {
+      const siteLoaderOverlay = document.getElementById('site-loader');
+      
+      // Check if user has visited before
+      const hasVisited = localStorage.getItem('cousinSiteVisited');
+      const speedMultiplier = hasVisited ? 0.5 : 1; // Half speed if returning visitor
+      
+      if (hasVisited) {
+        console.log('Returning visitor - loader at half speed');
+      } else {
+        console.log('First-time visitor - loader at full speed');
+      }
+      
+      let currentPercentage = 0;
+      const targetPercentage = 100;
+      const loaderElement = document.getElementById('loader');
+
+      function displayPercentage(percentage) {
+        loaderElement.innerHTML = '';
+        
+        // Use pre-created complete states from alt_2 folder with fallback
+        const img = document.createElement('img');
+        
+        // Check if the specific percentage PNG exists, otherwise use fallback
+        const alt2Path = `assets/loader/alt_2/${percentage}.png`;
+        const fallbackPath = `assets/loader/alt_2/0.png`; // Fallback to 0.png if missing
+        
+        img.src = alt2Path;
+        img.alt = percentage + '%';
+        img.className = 'loader-digit';
+        
+        // Add error handling for missing images
+        img.onerror = function() {
+          console.log(`Missing PNG for ${percentage}%, using fallback`);
+          this.src = fallbackPath;
+        };
+        
+        // No manual sizing - use the pre-set sizes from the PNGs
+        loaderElement.appendChild(img);
+
+        // No positioning needed - CSS handles everything using column guides
+      }
+
+      // Available percentages with PNGs in alt_2 folder
+      const availablePercentages = [0, 6, 13, 20, 27, 35, 42, 49, 56, 63, 71, 78, 85, 93, 100];
+      let currentIndex = 0;
+      
+      function animateLoader() {
+        if (currentIndex < availablePercentages.length) {
+          currentPercentage = availablePercentages[currentIndex];
+          displayPercentage(currentPercentage);
+          currentIndex++;
+          
+          if (currentPercentage >= targetPercentage) {
+            currentPercentage = targetPercentage;
+            displayPercentage(currentPercentage);
+            console.log('Loading complete - showing site');
+            
+            // Wait before revealing site (shorter for returning visitors)
+            const finalDelay = hasVisited ? 400 : 800;
+            setTimeout(() => {
+              siteLoaderOverlay.classList.add('hidden');
+              // Mark that user has visited
+              localStorage.setItem('cousinSiteVisited', 'true');
+            }, finalDelay);
+            
+            return;
+          }
+          
+          // Randomize delay - very fast between 28-98%
+          let minDelay, maxDelay;
+          
+          if (currentPercentage < 20) {
+            minDelay = 300;
+            maxDelay = 700;
+          } else if (currentPercentage >= 28 && currentPercentage < 98) {
+            minDelay = 50;
+            maxDelay = 150;
+          } else {
+            minDelay = 100;
+            maxDelay = 300;
+          }
+          
+          // Apply speed multiplier for returning visitors (half the time)
+          const delay = Math.floor((Math.random() * (maxDelay - minDelay + 1)) + minDelay) * speedMultiplier;
+          setTimeout(animateLoader, delay);
+        }
+      }
+
+      // Start the loader (shorter initial delay for returning visitors)
+      const initialDelay = hasVisited ? 250 : 500;
+      setTimeout(animateLoader, initialDelay);
+    })();
+
+    // ==========================================
+    // MAIN SITE FUNCTIONALITY
+    // ==========================================
+    
+    // Disable/Enable hover effects for child directors
+    function disableHoverEffects() {
+      const arielToggle = document.getElementById('ariel-toggle');
+      const maxToggle = document.getElementById('max-toggle');
+      
+      if (arielToggle) {
+        arielToggle.style.pointerEvents = 'none';
+      }
+      if (maxToggle) {
+        maxToggle.style.pointerEvents = 'none';
+      }
+      
+      console.log('Hover effects disabled');
+    }
+    
+    function enableHoverEffects() {
+      const arielToggle = document.getElementById('ariel-toggle');
+      const maxToggle = document.getElementById('max-toggle');
+      
+      if (arielToggle) {
+        arielToggle.style.pointerEvents = 'auto';
+      }
+      if (maxToggle) {
+        maxToggle.style.pointerEvents = 'auto';
+      }
+      
+      console.log('Hover effects enabled');
+    }
+    
     // Navigation functionality
     document.getElementById('about-toggle').addEventListener('click', function(e) {
       const content = document.getElementById('about-content');
@@ -825,14 +1019,14 @@
         logo.classList.add('hidden');
       } else if (arielContent.classList.contains('open')) {
         // Only show Ariel PNG when Ariel Martin section is specifically open
-        logo.src = 'Ariel_Martin/Ariel.png';
+        logo.src = 'directors/ariel_martin/Ariel.png';
         logo.classList.remove('hidden');
       } else {
         // Show Cousin logo in ALL other scenarios
         if (isMobile) {
-          logo.src = 'logo_varients/CousinMed.png';
+          logo.src = 'assets/images/logos/CousinMed.png';
         } else {
-          logo.src = 'cousin_logo_HiRes_2.png';
+          logo.src = 'assets/images/logos/cousin_logo_HiRes_2.png';
         }
         logo.classList.remove('hidden');
       }
@@ -874,17 +1068,16 @@
       // Toggle current section
       content.classList.toggle('open');
       
-      // If opening directors, wait for animation to finish (300ms), then disable hover effects for 500ms
+      // If opening directors, disable child director interactions for 0.5 second
       if (content.classList.contains('open')) {
         hoverDelayActive = true;
-        console.log('Directors expanding...');
+        disableHoverEffects();
+        console.log('Directors expanding - child directors disabled for 0.5 second');
         setTimeout(() => {
-          console.log('Directors expanded - starting 500ms hover delay');
-          setTimeout(() => {
-            hoverDelayActive = false;
-            console.log('Hover effects now active');
-          }, 500);
-        }, 300); // Wait for expansion animation to complete
+          hoverDelayActive = false;
+          enableHoverEffects();
+          console.log('Child directors now interactive');
+        }, 500); // Wait 0.5 second before allowing interaction
       }
       
       // If directors section is being closed, also close sub-sections
@@ -920,11 +1113,11 @@
       updateLogo();
       
       if (content.classList.contains('open')) {
-        // Disable hover effects for 1.25 seconds after expanding
+        // Disable hover effects for 0.5 second after expanding
         disableHoverEffects();
         setTimeout(() => {
           enableHoverEffects();
-        }, 1250);
+        }, 500);
       }
     });
 
@@ -938,7 +1131,7 @@
       const arielContent = document.getElementById('ariel-projects');
       
       if (directorsContent.classList.contains('open') && !arielContent.classList.contains('open')) {
-        logo.src = 'Ariel_Martin/Ariel.png';
+        logo.src = 'directors/ariel_martin/Ariel.png';
         logo.classList.remove('hidden');
       }
     });
@@ -963,6 +1156,14 @@
       
       // Toggle current section
       content.classList.toggle('open');
+      
+      if (content.classList.contains('open')) {
+        // Disable hover effects for 0.5 second after expanding
+        disableHoverEffects();
+        setTimeout(() => {
+          enableHoverEffects();
+        }, 500);
+      }
     });
 
     document.getElementById('contact-toggle').addEventListener('click', function(e) {
@@ -1002,7 +1203,7 @@
 
 
     // Load CSV data and create project elements
-    Papa.parse('ArielMartin.csv', {
+    Papa.parse('data/ArielMartin.csv', {
       download: true,
       header: true,
       complete: function(results) {
@@ -1123,19 +1324,19 @@
       // Convert video path to image path
       let imageSrc;
       if (videoSrc.includes('Prime_CricketWorldCup.mp4')) {
-        imageSrc = 'Ariel_Martin/Prime_CricketWorldCup_optimized.png';
+        imageSrc = 'directors/ariel_martin/Prime_CricketWorldCup_optimized.png';
       } else if (videoSrc.includes('Vodafone_DoubleCoverage.mp4')) {
-        imageSrc = 'Ariel_Martin/Vodafone_DoubleCoverage_optimized.png';
+        imageSrc = 'directors/ariel_martin/Vodafone_DoubleCoverage_optimized.png';
       } else if (videoSrc.includes('KIA_TheUte.mp4')) {
-        imageSrc = 'Ariel_Martin/KIA_TheUte_optimized.png';
+        imageSrc = 'directors/ariel_martin/KIA_TheUte_optimized.png';
       } else if (videoSrc.includes('GWM_OutThereAwaits.mp4')) {
-        imageSrc = 'Ariel_Martin/GWM_OutThereAwaits_optimized.png';
+        imageSrc = 'directors/ariel_martin/GWM_OutThereAwaits_optimized.png';
       } else if (videoSrc.includes('BALTER_BeersDoComeTrue.mp4')) {
-        imageSrc = 'Ariel_Martin/BALTER_BeersDoComeTrue_optimized.png';
+        imageSrc = 'directors/ariel_martin/BALTER_BeersDoComeTrue_optimized.png';
       } else if (videoSrc.includes('MAS_TheOverthinkermp4.mp4')) {
-        imageSrc = 'Ariel_Martin/MAS_TheOverthinkermp4_optimized.png';
+        imageSrc = 'directors/ariel_martin/MAS_TheOverthinkermp4_optimized.png';
       } else if (videoSrc.includes('WAPOLICE-LetsJoinTheForces.mp4')) {
-        imageSrc = 'Ariel_Martin/WAPOLICE-LetsJoinTheForces_optimized.png';
+        imageSrc = 'directors/ariel_martin/WAPOLICE-LetsJoinTheForces_optimized.png';
       }
       
       img.src = imageSrc;
