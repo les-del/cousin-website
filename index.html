@@ -1405,23 +1405,43 @@
         imageSrc = 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
       }
       
-      // Crossfade effect: fade out current image, then fade in new one
+      // Crossfade effect: keep previous image visible while new one fades in
       if (img.src && img.src !== imageSrc) {
-        // Fade out current image
-        img.style.opacity = '0';
+        // Create a temporary image element for the new image
+        const tempImg = document.createElement('img');
+        tempImg.className = 'video-hover-overlay-media-video';
+        tempImg.style.position = 'absolute';
+        tempImg.style.top = '0';
+        tempImg.style.left = '0';
+        tempImg.style.opacity = '0';
+        tempImg.style.transition = 'opacity 0.25s ease-in-out';
         
-        setTimeout(() => {
-          // Change source after fade out
-          img.src = imageSrc;
+        // Add temp image to container
+        const container = overlay.querySelector('.video-hover-overlay-media-video-container');
+        container.appendChild(tempImg);
+        
+        // Preload new image
+        const imgPreloader = new Image();
+        imgPreloader.onload = function() {
+          tempImg.src = imageSrc;
           overlay.setAttribute('data-active', '1');
           
-          // Fade in new image
+          // Start crossfade: fade in new image
           setTimeout(() => {
-            img.style.opacity = '1';
+            tempImg.style.opacity = '1';
           }, 10);
           
+          // After new image is visible, remove old image and clean up
+          setTimeout(() => {
+            container.removeChild(img);
+            tempImg.style.position = '';
+            tempImg.style.top = '';
+            tempImg.style.left = '';
+          }, 250);
+          
           console.log('Hover overlay crossfaded to:', imageSrc);
-        }, 250); // Match transition duration
+        };
+        imgPreloader.src = imageSrc;
       } else {
         // First image or same image - no crossfade needed
         const imgPreloader = new Image();
