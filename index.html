@@ -553,6 +553,7 @@
       -moz-user-drag: none;
       -o-user-drag: none;
       user-drag: none;
+      transition: opacity 0.25s ease-in-out;
     }
 
     /* Tablet hover overlay video sizing - 8 columns on tablet grid */
@@ -1404,14 +1405,34 @@
         imageSrc = 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
       }
       
-      // Preload image for smoother transition
-      const imgPreloader = new Image();
-      imgPreloader.onload = function() {
-        img.src = imageSrc;
-        overlay.setAttribute('data-active', '1');
-        console.log('Hover overlay shown for:', imageSrc);
-      };
-      imgPreloader.src = imageSrc;
+      // Crossfade effect: fade out current image, then fade in new one
+      if (img.src && img.src !== imageSrc) {
+        // Fade out current image
+        img.style.opacity = '0';
+        
+        setTimeout(() => {
+          // Change source after fade out
+          img.src = imageSrc;
+          overlay.setAttribute('data-active', '1');
+          
+          // Fade in new image
+          setTimeout(() => {
+            img.style.opacity = '1';
+          }, 10);
+          
+          console.log('Hover overlay crossfaded to:', imageSrc);
+        }, 250); // Match transition duration
+      } else {
+        // First image or same image - no crossfade needed
+        const imgPreloader = new Image();
+        imgPreloader.onload = function() {
+          img.src = imageSrc;
+          overlay.setAttribute('data-active', '1');
+          img.style.opacity = '1';
+          console.log('Hover overlay shown for:', imageSrc);
+        };
+        imgPreloader.src = imageSrc;
+      }
     }
 
     function hideVideoHoverOverlay() {
