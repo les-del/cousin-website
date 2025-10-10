@@ -778,7 +778,7 @@
     </div>
   </div>
 
-  <img src="assets/images/logos/cousin_logo_HiRes_2.png" alt="COUSIN" class="logo">
+  <img src="assets/images/logos/cousin_logo_HiRes_2.png" alt="COUSIN" class="logo" loading="lazy">
 
   <!-- Temporary column guides - 12 columns with 1em gutters -->
   <div class="column-guides hidden" id="column-guides">
@@ -858,7 +858,7 @@
   <div class="director-portfolio-lightbox" data-active="0">
     <div class="director-portfolio-lightbox-media">
       <div class="director-portfolio-lightbox-media-video-container">
-        <video playsinline class="director-portfolio-lightbox-media-video" onclick="toggleVideo();">
+        <video playsinline preload="metadata" class="director-portfolio-lightbox-media-video" onclick="toggleVideo();">
           <source>
         </video>
         <div class="director-portfolio-lightbox-media-playbar" onmousedown="setProgress(event);" ontouchstart="setProgress(event);">
@@ -1261,6 +1261,9 @@
             const videoSrc = row.Video;
             
             if (videoSrc) {
+              // Preload the video metadata for faster playback
+              preloadVideo(videoSrc);
+              
               if (player.getAttribute('data-active') === '1') {
                 // Video player is open - show temporary hover overlay
                 showVideoHoverOverlay(videoSrc);
@@ -1333,6 +1336,30 @@
       }
     });
 
+    // Video preloading function
+    function preloadVideo(videoSrc) {
+      // Create a temporary video element to preload metadata
+      const tempVideo = document.createElement('video');
+      tempVideo.preload = 'metadata';
+      tempVideo.src = videoSrc;
+      tempVideo.style.display = 'none';
+      
+      // Add to DOM temporarily for preloading
+      document.body.appendChild(tempVideo);
+      
+      // Remove after metadata is loaded
+      tempVideo.addEventListener('loadedmetadata', function() {
+        document.body.removeChild(tempVideo);
+        console.log('Video metadata preloaded:', videoSrc);
+      });
+      
+      // Clean up on error
+      tempVideo.addEventListener('error', function() {
+        document.body.removeChild(tempVideo);
+        console.log('Video preload failed:', videoSrc);
+      });
+    }
+
     // Image hover overlay functions
     function showVideoHoverOverlay(videoSrc) {
       const overlay = document.querySelector('.video-hover-overlay');
@@ -1377,9 +1404,14 @@
         imageSrc = 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
       }
       
-      img.src = imageSrc;
-      overlay.setAttribute('data-active', '1');
-      console.log('Hover overlay shown for:', imageSrc);
+      // Preload image for smoother transition
+      const imgPreloader = new Image();
+      imgPreloader.onload = function() {
+        img.src = imageSrc;
+        overlay.setAttribute('data-active', '1');
+        console.log('Hover overlay shown for:', imageSrc);
+      };
+      imgPreloader.src = imageSrc;
     }
 
     function hideVideoHoverOverlay() {
@@ -1424,6 +1456,9 @@
       // Restore video source
       videoSource.src = videoSrc;
       videoElement.src = videoSrc; // Also set the video element's src directly
+      
+      // Set preload for faster playback
+      videoElement.preload = 'auto';
       
       // Reset video to beginning
       videoElement.currentTime = 0;
