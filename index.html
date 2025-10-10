@@ -1298,13 +1298,13 @@
             if (videoSrc) {
               openVideoPlayer(videoSrc);
               
-              // Disable ALL interactions on project items for 1 second after clicking to prevent jarring transitions
+              // Disable ALL interactions on project items for 2 seconds after clicking to prevent jarring transitions
               hoverDelayActive = true;
               const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
               allProjectItems.forEach(item => {
                 item.style.pointerEvents = 'none';
               });
-              console.log('Video clicked - all project items disabled for 1 second');
+              console.log('Video clicked - all project items disabled for 2 seconds');
               
               setTimeout(() => {
                 hoverDelayActive = false;
@@ -1312,7 +1312,7 @@
                   item.style.pointerEvents = 'auto';
                 });
                 console.log('All project items re-enabled');
-              }, 1000);
+              }, 2000);
             }
           });
           
