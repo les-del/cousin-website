@@ -807,11 +807,10 @@
       <li class="nav-item">
         <div id="about-toggle" class="nav-toggle">About</div>
         <ul id="about-content" class="nav-sublist">
-          <li>That person you ran with</li>
-          <li>The one you trusted</li>
-          <li>The one you built stuff with</li>
-          <li>Wrecked stuff with</li>
-          <li>The one who lit the fuse and said run</li>
+          <li>THAT PERSON YOU RAN WITH.</li>
+          <li>THE ONE YOU TRUSTED.THE ONE YOU BUILT</li>
+          <li>STUFF WITH. WRECKED STUFF WITH.</li>
+          <li>THE ONE WHO LIT THE FUSE AND SAID RUN.</li>
         </ul>
       </li>
       
@@ -822,14 +821,6 @@
             <div id="ariel-toggle" class="nav-toggle">Ariel martin</div>
             <ul id="ariel-projects" class="nav-sublist">
               <!-- Projects will be loaded dynamically from CSV -->
-            </ul>
-          </li>
-          <li id="max-director" style="display: none;">
-            <div id="max-toggle" class="nav-toggle">Max Chan</div>
-            <ul id="max-projects" class="nav-sublist">
-              <li class="project-item" data-video="dummy-video-1.mp4">Nike 'Just Do It'</li>
-              <li class="project-item" data-video="dummy-video-2.mp4">Apple 'Think Different'</li>
-              <li class="project-item" data-video="dummy-video-3.mp4">McDonald's 'I'm Lovin It'</li>
             </ul>
           </li>
         </ul>
@@ -1017,13 +1008,9 @@
     // Disable/Enable hover effects for child directors
     function disableHoverEffects() {
       const arielToggle = document.getElementById('ariel-toggle');
-      const maxToggle = document.getElementById('max-toggle');
       
       if (arielToggle) {
         arielToggle.style.pointerEvents = 'none';
-      }
-      if (maxToggle) {
-        maxToggle.style.pointerEvents = 'none';
       }
       
       console.log('Hover effects disabled');
@@ -1031,13 +1018,9 @@
     
     function enableHoverEffects() {
       const arielToggle = document.getElementById('ariel-toggle');
-      const maxToggle = document.getElementById('max-toggle');
       
       if (arielToggle) {
         arielToggle.style.pointerEvents = 'auto';
-      }
-      if (maxToggle) {
-        maxToggle.style.pointerEvents = 'auto';
       }
       
       console.log('Hover effects enabled');
@@ -1049,7 +1032,6 @@
       const directorsContent = document.getElementById('directors-content');
       const contactContent = document.getElementById('contact-content');
       const arielContent = document.getElementById('ariel-projects');
-      const maxContent = document.getElementById('max-projects');
       const contactImageOverlay = document.getElementById('contact-image-overlay');
       
       // ALWAYS close video first before closing any sections
@@ -1060,7 +1042,6 @@
       directorsContent.classList.remove('open');
       contactContent.classList.remove('open');
       arielContent.classList.remove('open'); // Also close Ariel Martin
-      maxContent.classList.remove('open'); // Also close Max Chan
       
       // Close bio content if it's open
       const bioContent = document.getElementById('bio-content');
@@ -1117,7 +1098,6 @@
       const aboutContent = document.getElementById('about-content');
       const contactContent = document.getElementById('contact-content');
       const arielContent = document.getElementById('ariel-projects');
-      const maxContent = document.getElementById('max-projects');
       const contactImageOverlay = document.getElementById('contact-image-overlay');
       
       // ALWAYS close video first before closing any sections
@@ -1154,7 +1134,6 @@
       // If directors section is being closed, also close sub-sections
       if (!content.classList.contains('open')) {
         arielContent.classList.remove('open');
-        maxContent.classList.remove('open');
       }
       
       // Update logo AFTER everything else is done to prevent glitches
@@ -1163,18 +1142,11 @@
 
     document.getElementById('ariel-toggle').addEventListener('click', function(e) {
       const content = document.getElementById('ariel-projects');
-      const maxContent = document.getElementById('max-projects');
       
       // If Ariel is currently open and we're about to close it, close any playing video
       if (content.classList.contains('open')) {
         closeVideoAndReset(); // Close video before collapsing
         console.log('Ariel collapsing - closing video');
-      }
-      
-      // Close Max Chan if it's open and reset any playing video
-      if (maxContent.classList.contains('open')) {
-        maxContent.classList.remove('open');
-        closeVideoAndReset(); // Close any video that might be playing
       }
       
       // Toggle current section
@@ -1212,28 +1184,6 @@
       const arielContent = document.getElementById('ariel-projects');
       if (!arielContent.classList.contains('open')) {
         updateLogo();
-      }
-    });
-
-    document.getElementById('max-toggle').addEventListener('click', function(e) {
-      const content = document.getElementById('max-projects');
-      const arielContent = document.getElementById('ariel-projects');
-      
-      // Close Ariel Martin if it's open and reset any playing video
-      if (arielContent.classList.contains('open')) {
-        arielContent.classList.remove('open');
-        closeVideoAndReset(); // Close any video that might be playing
-      }
-      
-      // Toggle current section
-      content.classList.toggle('open');
-      
-      if (content.classList.contains('open')) {
-        // Disable hover effects for 0.5 second after expanding
-        disableHoverEffects();
-        setTimeout(() => {
-          enableHoverEffects();
-        }, 500);
       }
     });
 
@@ -1295,15 +1245,16 @@
           projectElement.addEventListener('mouseenter', function(e) {
             e.stopPropagation();
             
-            // Ignore hover if delay is active (right after opening directors)
-            if (hoverDelayActive) {
-              return;
-            }
-            
             // Close bio content if it's open when hovering over any video project
             const bioContent = document.getElementById('bio-content');
             if (bioContent && bioContent.classList.contains('open')) {
               bioContent.classList.remove('open');
+            }
+            
+            // Ignore hover OVERLAY if delay is active (right after opening directors or clicking a video)
+            // But still allow other interactions
+            if (hoverDelayActive) {
+              return;
             }
             
             const player = document.querySelector('.director-portfolio-lightbox');
@@ -1346,6 +1297,22 @@
             const videoSrc = row.Video;
             if (videoSrc) {
               openVideoPlayer(videoSrc);
+              
+              // Disable ALL interactions on project items for 1 second after clicking to prevent jarring transitions
+              hoverDelayActive = true;
+              const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
+              allProjectItems.forEach(item => {
+                item.style.pointerEvents = 'none';
+              });
+              console.log('Video clicked - all project items disabled for 1 second');
+              
+              setTimeout(() => {
+                hoverDelayActive = false;
+                allProjectItems.forEach(item => {
+                  item.style.pointerEvents = 'auto';
+                });
+                console.log('All project items re-enabled');
+              }, 1000);
             }
           });
           
@@ -1692,58 +1659,8 @@
           const guides = document.getElementById('column-guides');
           guides.classList.toggle('hidden');
         }
-        
-        // Toggle capitalization with 'C' key
-        if (e.key === 'c' || e.key === 'C') {
-          isTitleCase = !isTitleCase;
-          updateTextCase();
-        }
-        
-        // Toggle director mode with 'D' key
-        if (e.key === 'd' || e.key === 'D') {
-          isMultiDirectorMode = !isMultiDirectorMode;
-          updateDirectorMode();
-        }
       });
     });
-
-    // Director mode state (toggled with 'D' key)
-    let isMultiDirectorMode = false;
-
-    function updateDirectorMode() {
-      const maxDirector = document.getElementById('max-director');
-
-      if (isMultiDirectorMode) {
-        // Show Max Chan director
-        maxDirector.style.display = 'block';
-        console.log('Multi Director Mode');
-      } else {
-        // Hide Max Chan director and close its submenu if open
-        maxDirector.style.display = 'none';
-        const maxProjects = document.getElementById('max-projects');
-        maxProjects.classList.remove('open');
-        console.log('Single Director Mode');
-      }
-    }
-
-    // Case toggle state (toggled with 'C' key)
-    let isTitleCase = false; // Start with UPPERCASE (default)
-
-    function updateTextCase() {
-      const body = document.body;
-      
-      if (isTitleCase) {
-        // Switch to selective Title Case mode
-        body.style.textTransform = 'none'; // Remove global uppercase
-        body.classList.add('selective-case');
-        console.log('Selective Title Case Mode');
-      } else {
-        // Switch to UPPERCASE (default)
-        body.style.textTransform = 'uppercase';
-        body.classList.remove('selective-case');
-        console.log('UPPERCASE Mode');
-      }
-    }
   </script>
 </body>
 </html>
