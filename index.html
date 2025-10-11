@@ -553,7 +553,6 @@
       -moz-user-drag: none;
       -o-user-drag: none;
       user-drag: none;
-      transition: opacity 0.25s ease-in-out;
     }
 
     /* Tablet hover overlay video sizing - 8 columns on tablet grid */
@@ -1405,54 +1404,14 @@
         imageSrc = 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
       }
       
-      // Crossfade effect: keep previous image visible while new one fades in
-      if (img.src && img.src !== imageSrc) {
-        // Create a temporary image element for the new image
-        const tempImg = document.createElement('img');
-        tempImg.className = 'video-hover-overlay-media-video';
-        tempImg.style.position = 'absolute';
-        tempImg.style.top = '0';
-        tempImg.style.left = '0';
-        tempImg.style.opacity = '0';
-        tempImg.style.transition = 'opacity 0.25s ease-in-out';
-        
-        // Add temp image to container
-        const container = overlay.querySelector('.video-hover-overlay-media-video-container');
-        container.appendChild(tempImg);
-        
-        // Preload new image
-        const imgPreloader = new Image();
-        imgPreloader.onload = function() {
-          tempImg.src = imageSrc;
-          overlay.setAttribute('data-active', '1');
-          
-          // Start crossfade: fade in new image
-          setTimeout(() => {
-            tempImg.style.opacity = '1';
-          }, 10);
-          
-          // After new image is visible, remove old image and clean up
-          setTimeout(() => {
-            container.removeChild(img);
-            tempImg.style.position = '';
-            tempImg.style.top = '';
-            tempImg.style.left = '';
-          }, 250);
-          
-          console.log('Hover overlay crossfaded to:', imageSrc);
-        };
-        imgPreloader.src = imageSrc;
-      } else {
-        // First image or same image - no crossfade needed
-        const imgPreloader = new Image();
-        imgPreloader.onload = function() {
-          img.src = imageSrc;
-          overlay.setAttribute('data-active', '1');
-          img.style.opacity = '1';
-          console.log('Hover overlay shown for:', imageSrc);
-        };
-        imgPreloader.src = imageSrc;
-      }
+      // Preload image for smoother transition
+      const imgPreloader = new Image();
+      imgPreloader.onload = function() {
+        img.src = imageSrc;
+        overlay.setAttribute('data-active', '1');
+        console.log('Hover overlay shown for:', imageSrc);
+      };
+      imgPreloader.src = imageSrc;
     }
 
     function hideVideoHoverOverlay() {
