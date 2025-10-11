@@ -1561,12 +1561,33 @@
 
     function toggleFullscreen() {
       const video = document.querySelector('.director-portfolio-lightbox-media-video');
-      if (!document.fullscreenElement) {
-        video.requestFullscreen().catch(err => {
-          console.log(`Error attempting to enable fullscreen: ${err.message}`);
-        });
+      
+      // iOS Safari/Chrome requires webkitEnterFullscreen
+      if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      } else if (!document.fullscreenElement) {
+        // Standard fullscreen API for desktop
+        if (video.requestFullscreen) {
+          video.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+          });
+        } else if (video.webkitRequestFullscreen) {
+          video.webkitRequestFullscreen();
+        } else if (video.mozRequestFullScreen) {
+          video.mozRequestFullScreen();
+        } else if (video.msRequestFullscreen) {
+          video.msRequestFullscreen();
+        }
       } else {
-        document.exitFullscreen();
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
       }
     }
 
