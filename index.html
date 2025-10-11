@@ -544,6 +544,7 @@
       vertical-align: top;
       transform: translateZ(0);
       backface-visibility: hidden;
+      transition: none !important;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
@@ -1404,14 +1405,10 @@
         imageSrc = 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
       }
       
-      // Preload image for smoother transition
-      const imgPreloader = new Image();
-      imgPreloader.onload = function() {
-        img.src = imageSrc;
-        overlay.setAttribute('data-active', '1');
-        console.log('Hover overlay shown for:', imageSrc);
-      };
-      imgPreloader.src = imageSrc;
+      // INSTANT SWAP - NO PRELOADING, NO FADE, NO DELAYS
+      img.src = imageSrc;
+      overlay.setAttribute('data-active', '1');
+      console.log('Hover overlay shown for:', imageSrc);
     }
 
     function hideVideoHoverOverlay() {
