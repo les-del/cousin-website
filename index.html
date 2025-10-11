@@ -1677,6 +1677,9 @@
 
     // Add event listeners for video state changes
     document.addEventListener('DOMContentLoaded', function() {
+      // Set correct logo on page load (mobile vs desktop)
+      updateLogo();
+      
       const video = document.querySelector('.director-portfolio-lightbox-media-video');
       video.addEventListener('play', updateButtonStates);
       video.addEventListener('pause', updateButtonStates);
