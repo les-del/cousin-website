@@ -912,7 +912,7 @@
   <div class="director-portfolio-lightbox" data-active="0">
     <div class="director-portfolio-lightbox-media">
       <div class="director-portfolio-lightbox-media-video-container">
-        <video playsinline preload="metadata" class="director-portfolio-lightbox-media-video" onclick="toggleVideo();">
+        <video playsinline preload="metadata" poster="" class="director-portfolio-lightbox-media-video" onclick="toggleVideo();">
           <source>
         </video>
         <div class="director-portfolio-lightbox-media-playbar" onmousedown="setProgress(event);" ontouchstart="setProgress(event);">
@@ -1517,6 +1517,25 @@
       console.log('Hover overlay shown for:', imageSrc);
     }
 
+    function getPosterImageForVideo(videoSrc) {
+      if (videoSrc.includes('Prime_CricketWorldCup.mp4')) {
+        return 'directors/ariel_martin/posters/Prime_CricketWorldCup_optimized.jpg';
+      } else if (videoSrc.includes('Vodafone_DoubleCoverage.mp4')) {
+        return 'directors/ariel_martin/posters/Vodafone.jpg';
+      } else if (videoSrc.includes('KIA_TheUte.mp4')) {
+        return 'directors/ariel_martin/posters/KIA_TheUte_optimized.jpg';
+      } else if (videoSrc.includes('GWM_OutThereAwaits.mp4')) {
+        return 'directors/ariel_martin/posters/GWM_OutThereAwaits_optimized.jpg';
+      } else if (videoSrc.includes('BALTER_BeersDoComeTrue.mp4')) {
+        return 'directors/ariel_martin/posters/BALTER_BeersDoComeTrue_optimized.jpg';
+      } else if (videoSrc.includes('MAS_TheOverthinkermp4.mp4')) {
+        return 'directors/ariel_martin/posters/MAS_TheOverthinkermp4_optimized.jpg';
+      } else if (videoSrc.includes('WAPOLICE-LetsJoinTheForces.mp4')) {
+        return 'directors/ariel_martin/posters/WAPOLICE-LetsJoinTheForces_optimized.jpg';
+      }
+      return '';
+    }
+
     function hideVideoHoverOverlay() {
       const overlay = document.querySelector('.video-hover-overlay');
       const img = overlay.querySelector('.video-hover-overlay-media-video');
@@ -1550,11 +1569,27 @@
     }
 
     function openVideoPlayer(videoSrc) {
-      // DON'T hide hover overlay yet - keep it visible while video loads
+      // Show video player immediately with poster to prevent black flash
       
       const player = document.querySelector('.director-portfolio-lightbox');
       const videoSource = player.querySelector('.director-portfolio-lightbox-media-video source');
       const videoElement = player.querySelector('.director-portfolio-lightbox-media-video');
+      
+      // Set poster image FIRST to prevent black flash
+      const posterSrc = getPosterImageForVideo(videoSrc);
+      if (posterSrc) {
+        videoElement.poster = posterSrc;
+      }
+      
+      // IMMEDIATELY show the player with poster visible (no black moment)
+      player.setAttribute('data-active', '1');
+      player.style.setProperty('display', 'flex', 'important');
+      player.style.setProperty('visibility', 'visible', 'important');
+      player.style.setProperty('opacity', '1', 'important');
+      player.style.setProperty('z-index', '1700', 'important');
+      
+      // Hide hover overlay immediately since we're showing the poster
+      hideVideoHoverOverlay();
       
       // Restore video source
       videoSource.src = videoSrc;
@@ -1566,26 +1601,25 @@
       // Reset video to beginning
       videoElement.currentTime = 0;
       
-      // Keep player HIDDEN until video is loaded
-      player.setAttribute('data-active', '0');
-      player.style.setProperty('display', 'none', 'important');
-      console.log('Loading video... rollover stays visible');
+      // Show controls immediately since player is visible
+      const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
+      const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
+      if (playbar) {
+        playbar.style.display = '';
+        playbar.classList.add('show');
+      }
+      if (controls) {
+        controls.style.display = '';
+        controls.classList.add('show');
+      }
       
-      // Wait for video to have enough data before showing
+      console.log('Video player shown with poster, loading video...');
+      
+      // Wait for video to have enough data before auto-playing
       videoElement.addEventListener('loadeddata', function onVideoLoaded() {
-        console.log('Video loaded, hiding rollover and showing player');
+        console.log('Video loaded, starting playback');
         
-        // NOW hide the hover overlay since video is ready
-        hideVideoHoverOverlay();
-        
-        // Now show the video player - reset ALL CSS properties
-        player.setAttribute('data-active', '1');
-        player.style.setProperty('display', 'flex', 'important');
-        player.style.setProperty('visibility', 'visible', 'important');
-        player.style.setProperty('opacity', '1', 'important');
-        player.style.setProperty('z-index', '1700', 'important');
-        
-        // Auto play video
+        // Auto play video (player is already visible with poster)
         videoElement.play();
         updateTimeDisplay();
         
@@ -1593,18 +1627,6 @@
         const progressBar = document.querySelector('.director-portfolio-lightbox-media-playbar-meter-progress');
         if (progressBar) {
           progressBar.style.width = '0%';
-        }
-        
-        // Show controls immediately (no delay since video is loaded)
-        const playbar = document.querySelector('.director-portfolio-lightbox-media-playbar');
-        const controls = document.querySelector('.director-portfolio-lightbox-video-controls');
-        if (playbar) {
-          playbar.style.display = '';
-          playbar.classList.add('show');
-        }
-        if (controls) {
-          controls.style.display = '';
-          controls.classList.add('show');
         }
         
         // Update button states - show pause button since video autoplays
