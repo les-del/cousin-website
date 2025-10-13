@@ -1412,13 +1412,9 @@
             if (videoSrc) {
               openVideoPlayer(videoSrc);
               
-              // Disable ALL interactions on project items until cursor leaves the area
+              // Disable hover overlay (but keep clicks enabled) until cursor leaves the area
               hoverDelayActive = true;
-              const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
-              allProjectItems.forEach(item => {
-                item.style.pointerEvents = 'none';
-              });
-              console.log('Video clicked - all project items disabled until cursor leaves project area');
+              console.log('Video clicked - hover overlay disabled until cursor leaves project area');
             }
           });
           
@@ -1429,11 +1425,7 @@
         container.addEventListener('mouseleave', function(e) {
           if (hoverDelayActive) {
             hoverDelayActive = false;
-            const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
-            allProjectItems.forEach(item => {
-              item.style.pointerEvents = 'auto';
-            });
-            console.log('Cursor left project area - all project items re-enabled');
+            console.log('Cursor left project area - hover overlay re-enabled');
           }
         });
 
