@@ -3,7 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="We make. Commercials. Films. Noise in a screen.">
+  <meta name="theme-color" content="#ffffff">
   <title>Cousin</title>
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/social/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/social/apple-touch-icon.png">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cousin.site/">
+  <meta property="og:title" content="Cousin">
+  <meta property="og:description" content="We make. Commercials. Films. Noise in a screen.">
+  <meta property="og:image" content="https://cousin.site/assets/images/social/og-image.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://cousin.site/">
+  <meta property="twitter:title" content="Cousin">
+  <meta property="twitter:description" content="We make. Commercials. Films. Noise in a screen.">
+  <meta property="twitter:image" content="https://cousin.site/assets/images/social/og-image.png">
+  
+  <!-- PWA Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/images/social/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/images/social/icon-512.png">
+  
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
@@ -20,6 +45,36 @@
       -moz-user-drag: none;
       -o-user-drag: none;
       user-drag: none;
+      cursor: none; /* Hide native cursor for custom cursor */
+    }
+
+    /* Custom cursor with multiply blend mode */
+    .custom-cursor {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+      z-index: 999999;
+      mix-blend-mode: multiply;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-image: url('assets/images/C_1.png');
+      transform: translate(-50%, -50%);
+      opacity: 0; /* Hidden initially until loader finishes */
+      transition: opacity 0.3s ease;
+      will-change: transform, left, top;
+      display: block;
+    }
+    
+    .custom-cursor.visible {
+      opacity: 1;
+    }
+
+    .custom-cursor.active {
+      background-image: url('assets/images/C_2.png');
     }
 
     body {
@@ -216,7 +271,6 @@
     }
 
     .nav-toggle {
-      cursor: pointer;
       margin-bottom: 0;
     }
 
@@ -310,7 +364,6 @@
 
     /* Project items */
     .project-item {
-      cursor: pointer;
       margin-bottom: 0;
     }
 
@@ -326,12 +379,12 @@
 
     /* Loading cursor for the entire body when projects are loading */
     body.loading {
-      cursor: wait !important;
+      /* Custom cursor handles this */
     }
 
     /* Ensure all interactive elements show loading cursor during loading */
     body.loading * {
-      cursor: wait !important;
+      /* Custom cursor handles this */
     }
 
     /* Video Player */
@@ -414,7 +467,6 @@
       width: 100%;
       height: 4px;
       background: rgba(0, 0, 0, 0.3);
-      cursor: pointer;
       margin-top: 0;
       opacity: 0;
       transition: opacity 0.1s ease;
@@ -462,12 +514,10 @@
       font-weight: 400;
       letter-spacing: -0.02em;
       text-transform: uppercase;
-      cursor: pointer;
     }
 
     .director-portfolio-lightbox-controls-play,
     .director-portfolio-lightbox-controls-pause {
-      cursor: pointer;
       color: #000;
       display: flex;
       align-items: center;
@@ -634,7 +684,6 @@
       margin: 0;
       padding: 0;
       max-width: calc((100vw - 13em) / 12 * 6 + 5em); /* 6 columns + 5 gutters - Desktop */
-      cursor: default; /* Show default cursor, not pointer */
       word-wrap: break-word;
     }
 
@@ -779,6 +828,9 @@
       <!-- Loader images will be dynamically inserted here -->
     </div>
   </div>
+
+  <!-- Custom cursor element -->
+  <div class="custom-cursor"></div>
 
   <img src="assets/images/logos/cousin_logo_HiRes_2.png" alt="COUSIN" class="logo" loading="lazy">
 
@@ -956,6 +1008,12 @@
               siteLoaderOverlay.classList.add('hidden');
               // Mark that user has visited
               localStorage.setItem('cousinSiteVisited', 'true');
+              
+              // Show custom cursor after loader finishes
+              const customCursor = document.querySelector('.custom-cursor');
+              if (customCursor) {
+                customCursor.classList.add('visible');
+              }
             }, finalDelay);
             
             return;
@@ -1000,6 +1058,57 @@
           }
         };
         img.src = src;
+      });
+    })();
+
+    // ==========================================
+    // CUSTOM CURSOR WITH MULTIPLY BLEND MODE
+    // ==========================================
+    
+    (function() {
+      const customCursor = document.querySelector('.custom-cursor');
+      
+      if (!customCursor) {
+        console.error('Custom cursor element not found in DOM!');
+        return;
+      }
+      
+      console.log('Custom cursor initialized');
+      
+      // Update cursor position on mouse move
+      document.addEventListener('mousemove', function(e) {
+        customCursor.style.left = e.clientX + 'px';
+        customCursor.style.top = e.clientY + 'px';
+      });
+      
+      // Selector for all interactive/clickable elements
+      const interactiveSelectors = '.nav-toggle, .project-item, a, .director-portfolio-lightbox-media-playbar, .director-portfolio-lightbox-controls-play, .director-portfolio-lightbox-controls-pause, .director-portfolio-lightbox-video-controls-right';
+      
+      // Add active class when hovering over interactive elements
+      document.addEventListener('mouseover', function(e) {
+        if (e.target.matches(interactiveSelectors) || e.target.closest(interactiveSelectors)) {
+          customCursor.classList.add('active');
+        }
+      });
+      
+      // Remove active class when leaving interactive elements
+      document.addEventListener('mouseout', function(e) {
+        if (e.target.matches(interactiveSelectors) || e.target.closest(interactiveSelectors)) {
+          customCursor.classList.remove('active');
+        }
+      });
+      
+      // Hide cursor when leaving window
+      document.addEventListener('mouseleave', function() {
+        customCursor.classList.remove('visible');
+      });
+      
+      // Show cursor when entering window (only if loader is done)
+      document.addEventListener('mouseenter', function() {
+        if (!document.getElementById('site-loader').classList.contains('hidden')) {
+          return; // Don't show cursor if loader is still visible
+        }
+        customCursor.classList.add('visible');
       });
     })();
 
@@ -1092,7 +1201,7 @@
       hideVideoHoverOverlay();
     }
 
-    // Flag to prevent hover effects right after opening directors
+    // Flag to prevent hover effects until cursor leaves project area
     let hoverDelayActive = false;
 
     document.getElementById('directors-toggle').addEventListener('click', function(e) {
@@ -1303,25 +1412,29 @@
             if (videoSrc) {
               openVideoPlayer(videoSrc);
               
-              // Disable ALL interactions on project items for 2 seconds after clicking to prevent jarring transitions
+              // Disable ALL interactions on project items until cursor leaves the area
               hoverDelayActive = true;
               const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
               allProjectItems.forEach(item => {
                 item.style.pointerEvents = 'none';
               });
-              console.log('Video clicked - all project items disabled for 2 seconds');
-              
-              setTimeout(() => {
-                hoverDelayActive = false;
-                allProjectItems.forEach(item => {
-                  item.style.pointerEvents = 'auto';
-                });
-                console.log('All project items re-enabled');
-              }, 2000);
+              console.log('Video clicked - all project items disabled until cursor leaves project area');
             }
           });
           
           container.appendChild(projectElement);
+        });
+
+        // Re-enable hover effects when cursor leaves the project list area
+        container.addEventListener('mouseleave', function(e) {
+          if (hoverDelayActive) {
+            hoverDelayActive = false;
+            const allProjectItems = document.querySelectorAll('#ariel-projects .project-item');
+            allProjectItems.forEach(item => {
+              item.style.pointerEvents = 'auto';
+            });
+            console.log('Cursor left project area - all project items re-enabled');
+          }
         });
 
         // Bio functionality disabled for now
